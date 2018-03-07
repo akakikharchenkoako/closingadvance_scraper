@@ -1,0 +1,14 @@
+# Scrapy
+scrapy==1.4.0
+fake-useragent==0.1.8
+scrapy-crawlera==1.2.4
+
+# Database
+peewee==2.10.2
+PyMySQL==0.7.11
+
+# zipcodes
+zipcodes==1.0.3
+
+# datetime utilities
+python-dateutil==2.6.1
