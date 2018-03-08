@@ -16,12 +16,11 @@ class RealtorAgentFinderSpider(scrapy.Spider):
     search_url = 'https://www.realtor.com/realestateteam/{}'
 
     def start_requests(self):
-        yield scrapy.Request('https://www.realtor.com/realestateteam/89109', callback=self.parse)
-        '''
-        for zipcode in zipcodes.list_all()[:100]:
+        # yield scrapy.Request('https://www.realtor.com/realestateteam/89109', callback=self.parse)
+
+        for zipcode in zipcodes.list_all():
             url = self.search_url.format(zipcode['zip_code'])
             yield scrapy.Request(url, callback=self.parse)
-        '''
 
     def parse(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
