@@ -59,6 +59,10 @@ class MySQLPipeline(object):
             return self.process_bank_info_item(item, spider)
         elif isinstance(item, LenderItem):
             return self.process_lender_item(item, spider)
+        elif isinstance(item, RealtorAgentItem):
+            return self.process_realtor_agent_item(item, spider)
+        elif isinstance(item, RealtorBrokerItem):
+            return self.process_realtor_broker_item(item, spider)
         else:
             return item
 
@@ -490,3 +494,67 @@ class MySQLPipeline(object):
             q.execute()
         return item
 
+    def process_realtor_agent_item(self, item, spider):
+        try:
+            RealtorAgent.get(RealtorAgent.originUrl == item['originUrl'])
+        except RealtorAgent.DoesNotExist:
+            RealtorAgent.create(
+                originUrl=item.get('originUrl'),
+                brokerUrl=item.get('brokerUrl'),
+                agentName=item.get('agentName'),
+                designation=item.get('designation'),
+                agentMobile=item.get('agentMobile'),
+                activeListings=item.get('activeListings'),
+                salesLast12Months=item.get('salesLast12Months'),
+                officeName=item.get('officeName'),
+                officePhone=item.get('officePhone'),
+                officeAddress=item.get('officeAddress'),
+                location=item.get('location'),
+                teamUrl=item.get('teamUrl'),
+            )
+        else:
+            q = RealtorAgent.update(
+                agentName=item.get('agentName'),
+                designation=item.get('designation'),
+                agentMobile=item.get('agentMobile'),
+                activeListings=item.get('activeListings'),
+                salesLast12Months=item.get('salesLast12Months'),
+                officeName=item.get('officeName'),
+                officePhone=item.get('officePhone'),
+                officeAddress=item.get('officeAddress'),
+                location=item.get('location'),
+                modified=datetime.datetime.now(),
+                teamUrl=item.get('teamUrl'),
+            ).where(RealtorAgent.originUrl == item['originUrl'])
+            q.execute()
+        return item
+
+    def process_realtor_broker_item(self, item, spider):
+        try:
+            RealtorBroker.get(RealtorBroker.originUrl == item['originUrl'])
+        except RealtorBroker.DoesNotExist:
+            RealtorBroker.create(
+                originUrl=item.get('originUrl'),
+                brokerName=item.get('brokerName'),
+                brokerTitle=item.get('brokerTitle'),
+                brokerMobile=item.get('brokerMobile'),
+                officeName=item.get('officeName'),
+                officePhone=item.get('officePhone'),
+                officeAddress=item.get('officeAddress'),
+                location=item.get('location'),
+                teamUrl=item.get('teamUrl'),
+            )
+        else:
+            q = RealtorBroker.update(
+                brokerName=item.get('brokerName'),
+                brokerTitle=item.get('brokerTitle'),
+                brokerMobile=item.get('brokerMobile'),
+                officeName=item.get('officeName'),
+                officePhone=item.get('officePhone'),
+                officeAddress=item.get('officeAddress'),
+                location=item.get('location'),
+                modified=datetime.datetime.now(),
+                teamUrl=item.get('teamUrl'),
+            ).where(RealtorBroker.originUrl == item['originUrl'])
+            q.execute()
+        return item

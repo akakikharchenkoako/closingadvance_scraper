@@ -26,6 +26,7 @@ class Agent(Model):
 
 
 class RealtorAgent(Agent):
+    teamUrl = CharField(null=True, unique=True)
 
     class Meta:
         db_table = 'realtor_agents'
@@ -60,6 +61,16 @@ class ZillowBroker(Broker):
 
     class Meta:
         db_table = 'zillow_brokers'
+        database = db
+
+
+class RealtorBroker(Broker):
+    originUrl = CharField(null=True, unique=True)
+    created = DateTimeField(default=datetime.datetime.now)
+    modified = DateTimeField(null=True)
+
+    class Meta:
+        db_table = 'realtor_brokers'
         database = db
 
 

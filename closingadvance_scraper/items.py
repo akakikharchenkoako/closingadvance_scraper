@@ -86,6 +86,16 @@ class ZillowBrokerItem(BrokerItem):
     pass
 
 
+class RealtorBrokerItem(BrokerItem):
+    teamUrl = scrapy.Field()
+    pass
+
+
+class RealtorAgentItem(AgentItem):
+    teamUrl = scrapy.Field()
+    pass
+
+
 class Century21AgentItem(scrapy.Item):
     agentUrl = scrapy.Field()
     agentName = scrapy.Field()

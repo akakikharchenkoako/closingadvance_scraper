@@ -4,11 +4,12 @@ from closingadvance_scraper.database import db
 
 migrator = MySQLMigrator(db)
 
-
-verified = BooleanField(default=False, index=True)
-
+location = CharField(null=True, unique=True)
 
 migrate(
-    migrator.add_column('trulia_listings', 'verified', verified),
+    migrator.add_column('realtor_brokers', 'location', location),
 )
 
+migrate(
+    migrator.add_column('realtor_agents', 'location', location),
+)
