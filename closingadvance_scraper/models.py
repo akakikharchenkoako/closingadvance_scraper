@@ -27,6 +27,8 @@ class Agent(Model):
 
 class RealtorAgent(Agent):
     teamUrl = CharField(null=True, unique=True)
+    forSale = IntegerField(null=True)
+    recentlySold = IntegerField(null=True)
 
     class Meta:
         db_table = 'realtor_agents'
@@ -69,6 +71,9 @@ class RealtorBroker(Broker):
     originUrl = CharField(null=True, unique=True)
     created = DateTimeField(default=datetime.datetime.now)
     modified = DateTimeField(null=True)
+    brokerMobile2 = CharField(null=True, index=True)
+    brokerMobile3 = CharField(null=True, index=True)
+    brokerMobile4 = CharField(null=True, index=True)
 
     class Meta:
         db_table = 'realtor_brokers'

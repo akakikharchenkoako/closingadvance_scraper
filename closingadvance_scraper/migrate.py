@@ -4,12 +4,13 @@ from closingadvance_scraper.database import db
 
 migrator = MySQLMigrator(db)
 
-location = CharField(null=True, unique=True)
+Fax = CharField(null=True, unique=True)
 
 migrate(
-    migrator.add_column('realtor_brokers', 'location', location),
+    migrator.add_column('realtor_agents', 'fax', Fax),
 )
 
 migrate(
-    migrator.add_column('realtor_agents', 'location', location),
+    migrator.add_column('realtor_brokers', 'fax', Fax),
 )
+

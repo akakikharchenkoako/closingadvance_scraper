@@ -16,11 +16,12 @@ class RealtorAgentFinderSpider(scrapy.Spider):
     search_url = 'https://www.realtor.com/realestateteam/{}'
 
     def start_requests(self):
-        # yield scrapy.Request('https://www.realtor.com/realestateteam/89109', callback=self.parse)
-
+        yield scrapy.Request('https://www.realtor.com/realestateteam/89109', callback=self.parse)
+        '''
         for zipcode in zipcodes.list_all():
             url = self.search_url.format(zipcode['zip_code'])
             yield scrapy.Request(url, callback=self.parse)
+        '''
 
     def parse(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
@@ -94,14 +95,20 @@ class RealtorAgentFinderSpider(scrapy.Spider):
                     l.add_xpath('brokerName', "//div[@id='modalcontactInfo']//p[@class='modal-agent-name']/text()")
 
                 l.add_xpath('officeName', '//div[@id="popoverBrokerage"]//h4/text()')
+                mobileIndex = 1
 
                 for node in response.xpath('//div[@id="modalcontactInfo"]//li/i[contains(@class, "fa-phone")]/..'):
-                    if 'Office:' in node.extract() or 'Fax:' in node.extract():
+                    if 'Office:' in node.extract():
                         l.add_value('officePhone', node.xpath('./a/span/text()').extract_first())
                         continue
 
                     if 'Mobile:' in node.extract():
-                        l.add_value('brokerMobile', node.xpath('./a/span/text()').extract_first())
+                        if mobileIndex == 1:
+                            l.add_value('brokerMobile', node.xpath('./a/span/text()').extract_first())
+                        else:
+                            l.add_value('brokerMobile{0}'.format(mobileIndex), node.xpath('./a/span/text()').extract_first())
+
+                        mobileIndex += 1
 
                 l.add_xpath('officeAddress', '//div[@id="popoverBrokerage"]//li[contains(span/@class, "fa-map-marker")]/text()')
 
@@ -135,7 +142,7 @@ class RealtorAgentFinderSpider(scrapy.Spider):
                     l.add_xpath('agentName', "//div[@id='modalcontactInfo']//p[@class='modal-agent-name']/text()")
 
                 for node in response.xpath('//div[@id="modalcontactInfo"]//li/i[contains(@class, "fa-phone")]/..'):
-                    if 'Office:' in node.extract() or 'Fax:' in node.extract():
+                    if 'Office:' in node.extract():
                         l.add_value('officePhone', node.xpath('./a/span/text()').extract_first())
                         continue
 
@@ -146,18 +153,8 @@ class RealtorAgentFinderSpider(scrapy.Spider):
                 l.add_xpath('officeAddress',
                             '//div[@id="modalcontactInfo"]//span[@itemprop="streetAddress"]/text()')
 
-                '''
                 l.add_xpath('forSale', '//a[@data-nav-type="for_sale"]/@data-nav-count')
-                l.add_xpath('openHouse', '//a[@data-nav-type="open_house_all"]/@data-nav-count')
                 l.add_xpath('recentlySold', '//a[@data-nav-type="recently_sold"]/@data-nav-count')
-                l.add_xpath('officePhone', '//div[@id="popoverBrokerage"]//li[contains(span/@class, "fa-phone")]/text()')
-
-                if not l.get_output_value('officePhone'):
-                    for node in response.xpath('//li/i[contains(@class, "fa-phone")]/..'):
-                        if 'Office:' in node.extract() or 'Fax:' in node.extract():
-                            l.add_value('officePhone', node.xpath('./a/span/text()').extract_first())
-                            break                
-                '''
 
                 yield l.load_item()
         except Exception as e:
