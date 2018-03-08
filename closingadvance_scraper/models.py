@@ -65,6 +65,7 @@ class ZillowBroker(Broker):
 
 
 class RealtorBroker(Broker):
+    teamUrl = CharField(null=True, unique=True)
     originUrl = CharField(null=True, unique=True)
     created = DateTimeField(default=datetime.datetime.now)
     modified = DateTimeField(null=True)
