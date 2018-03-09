@@ -513,6 +513,7 @@ class MySQLPipeline(object):
                 recentlySold=item.get('recentlySold'),
                 location=item.get('location'),
                 teamUrl=item.get('teamUrl'),
+                search_keyword=item.get('search_keyword'),
             )
         else:
             q = RealtorAgent.update(
@@ -529,6 +530,7 @@ class MySQLPipeline(object):
                 recentlySold=item.get('recentlySold'),
                 modified=datetime.datetime.now(),
                 teamUrl=item.get('teamUrl'),
+                search_keyword=item.get('search_keyword'),
             ).where(RealtorAgent.originUrl == item['originUrl'])
             q.execute()
         return item
@@ -550,6 +552,7 @@ class MySQLPipeline(object):
                 officeAddress=item.get('officeAddress'),
                 location=item.get('location'),
                 teamUrl=item.get('teamUrl'),
+                search_keyword=item.get('search_keyword'),
             )
         else:
             q = RealtorBroker.update(
@@ -565,6 +568,7 @@ class MySQLPipeline(object):
                 location=item.get('location'),
                 modified=datetime.datetime.now(),
                 teamUrl=item.get('teamUrl'),
+                search_keyword=item.get('search_keyword'),
             ).where(RealtorBroker.originUrl == item['originUrl'])
             q.execute()
         return item

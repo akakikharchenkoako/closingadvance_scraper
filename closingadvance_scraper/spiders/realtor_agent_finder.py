@@ -16,28 +16,36 @@ class RealtorAgentFinderSpider(scrapy.Spider):
     search_url = 'https://www.realtor.com/realestateteam/{}'
 
     def start_requests(self):
-        # yield scrapy.Request('https://www.realtor.com/realestateteam/89109', callback=self.parse)
-        for zipcode in zipcodes.list_all():
+        """
+        yield scrapy.Request('https://www.realtor.com/realestateteam/89138', callback=self.parse, meta={'search_keyword': '89138'})
+        target_states = [state['abbr'] for state in states]
+        for zipcode in zipcodes.filter_by(zipcodes.list_all(), active=True):
+            if zipcode['state'] in target_states:
+                url = self.search_url.format(zipcode['city'], zipcode['state'], zipcode['zip_code'])
+                yield scrapy.Request(url, callback=self.parse)
+        """
+
+        for zipcode in zipcodes.filter_by(zipcodes.list_all(), active=True):
             url = self.search_url.format(zipcode['zip_code'])
-            yield scrapy.Request(url, callback=self.parse)
+            yield scrapy.Request(url, callback=self.parse, meta={'search_keyword': zipcode['zip_code']})
 
     def parse(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
 
         for agent_node in response.xpath('//div[@id="agent_list_wrapper"]/div'):
-            yield response.follow(agent_node.xpath('./@data-url').extract_first(), self.parse_team)
+            yield response.follow(agent_node.xpath('./@data-url').extract_first(), self.parse_team, meta={'search_keyword': response.meta.get('search_keyword')})
 
         if response.xpath('//nav[@class="pagination"]/span[@class="next"]/a[@class="next"]/@href').extract_first():
             yield scrapy.Request(response.xpath('//nav[@class="pagination"]/span[@class="next"]'
                                                 '/a[@class="next"]/@href').extract_first(),
-                                 self.parse, meta={'dont_cache': True})
+                                 self.parse, meta={'dont_cache': True, 'search_keyword': response.meta.get('search_keyword')})
 
     def parse_team(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
 
         for agent_profile_link in response.xpath('//div[@id="teams-section"]//div[@class="agent-simple-card"]/a'):
             yield response.follow(agent_profile_link.xpath('./@href').extract_first(),
-                                  self.parse_agent_profile, meta={'teamUrl': response.url})
+                                  self.parse_agent_profile, meta={'teamUrl': response.url, 'search_keyword': response.meta.get('search_keyword')})
 
     def parse_agent_profile(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
@@ -52,6 +60,7 @@ class RealtorAgentFinderSpider(scrapy.Spider):
         print(designation)
 
         designation = designation.strip() if designation else None
+        is_broker = False
 
         if designation:
             if ' - ' in designation:
@@ -62,7 +71,6 @@ class RealtorAgentFinderSpider(scrapy.Spider):
                 designation = re.search(r' \| (.+)', designation).group(1)
 
             broker_indicators = ['Broker', 'CEO', 'Owner', 'President', 'Chairman', 'Principal']
-            is_broker = False
 
             for indicator in broker_indicators:
                 if indicator.lower() in designation.lower():
@@ -74,6 +82,7 @@ class RealtorAgentFinderSpider(scrapy.Spider):
                 l.add_value('teamUrl', response.meta.get('teamUrl'))
                 l.add_value('originUrl', response.url)
                 l.add_value('brokerTitle', designation)
+                l.add_value('search_keyword', response.meta.get('search_keyword'))
                 broker_name = contact_info_block.xpath(".//p[@class='modal-agent-name']/text()").extract_first()
 
                 if ' - ' in broker_name:
@@ -120,6 +129,7 @@ class RealtorAgentFinderSpider(scrapy.Spider):
                 l.add_value('brokerUrl', response.meta.get('teamUrl'))
                 l.add_value('originUrl', response.url)
                 l.add_value('designation', designation)
+                l.add_value('search_keyword', response.meta.get('search_keyword'))
 
                 agent_name = contact_info_block.xpath(".//p[@class='modal-agent-name']/text()").extract_first()
 

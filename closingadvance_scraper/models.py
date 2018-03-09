@@ -26,7 +26,8 @@ class Agent(Model):
 
 
 class RealtorAgent(Agent):
-    teamUrl = CharField(null=True, unique=True)
+    teamUrl = CharField(null=True)
+    search_keyword = CharField(null=True)
     forSale = IntegerField(null=True)
     recentlySold = IntegerField(null=True)
 
@@ -67,8 +68,8 @@ class ZillowBroker(Broker):
 
 
 class RealtorBroker(Broker):
-    teamUrl = CharField(null=True, unique=True)
-    originUrl = CharField(null=True, unique=True)
+    teamUrl = CharField(null=True)
+    search_keyword = CharField(null=True)
     created = DateTimeField(default=datetime.datetime.now)
     modified = DateTimeField(null=True)
     brokerMobile2 = CharField(null=True, index=True)

@@ -88,15 +88,16 @@ class ZillowBrokerItem(BrokerItem):
 
 class RealtorBrokerItem(BrokerItem):
     teamUrl = scrapy.Field()
+    search_keyword = scrapy.Field()
     brokerMobile2 = scrapy.Field()
     brokerMobile3 = scrapy.Field()
     brokerMobile4 = scrapy.Field()
-
     pass
 
 
 class RealtorAgentItem(AgentItem):
     teamUrl = scrapy.Field()
+    search_keyword = scrapy.Field()
     forSale = scrapy.Field()
     recentlySold = scrapy.Field()
     pass
