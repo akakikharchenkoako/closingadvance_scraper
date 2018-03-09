@@ -30,7 +30,7 @@ class RealtorAgentFinderSpider(scrapy.Spider):
             yield scrapy.Request(url, callback=self.parse, meta={'search_keyword': zipcode['zip_code']})
 
     def parse(self, response):
-        self.logger.info('Crawled (%d) %s' % (response.status, response.url))
+        # self.logger.info('Crawled (%d) %s' % (response.status, response.url))
 
         for agent_node in response.xpath('//div[@id="agent_list_wrapper"]/div'):
             yield response.follow(agent_node.xpath('./@data-url').extract_first(), self.parse_team, meta={'search_keyword': response.meta.get('search_keyword')})
@@ -41,14 +41,14 @@ class RealtorAgentFinderSpider(scrapy.Spider):
                                  self.parse, meta={'dont_cache': True, 'search_keyword': response.meta.get('search_keyword')})
 
     def parse_team(self, response):
-        self.logger.info('Crawled (%d) %s' % (response.status, response.url))
+        # self.logger.info('Crawled (%d) %s' % (response.status, response.url))
 
         for agent_profile_link in response.xpath('//div[@id="teams-section"]//div[@class="agent-simple-card"]/a'):
             yield response.follow(agent_profile_link.xpath('./@href').extract_first(),
                                   self.parse_agent_profile, meta={'teamUrl': response.url, 'search_keyword': response.meta.get('search_keyword')})
 
     def parse_agent_profile(self, response):
-        self.logger.info('Crawled (%d) %s' % (response.status, response.url))
+        # self.logger.info('Crawled (%d) %s' % (response.status, response.url))
 
         contact_info_block = response.xpath("//div[@id='modalcontactInfo']")
         designation = contact_info_block.xpath(".//p[@class='modal-agent-name']/text()").extract_first()
