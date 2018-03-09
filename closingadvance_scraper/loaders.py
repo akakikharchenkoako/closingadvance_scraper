@@ -37,6 +37,12 @@ class BrokerLoader(ItemLoader):
     officePhone_in = MapCompose(serialize_number)
 
 
+class RealtorBrokerLoader(BrokerLoader):
+    brokerMobile2_in = MapCompose(serialize_number)
+    brokerMobile3_in = MapCompose(serialize_number)
+    brokerMobile4_in = MapCompose(serialize_number)
+
+
 class Century21AgentLoader(ItemLoader):
     default_input_processor = MapCompose(remove_tags, str.strip)
     default_output_processor = TakeFirst()

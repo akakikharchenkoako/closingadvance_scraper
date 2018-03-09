@@ -7,7 +7,7 @@ import zipcodes
 import re
 from closingadvance_scraper.locations import states
 from closingadvance_scraper.items import RealtorAgentItem, RealtorBrokerItem
-from closingadvance_scraper.loaders import AgentLoader, BrokerLoader
+from closingadvance_scraper.loaders import AgentLoader, RealtorBrokerLoader
 
 
 class RealtorAgentFinderSpider(scrapy.Spider):
@@ -60,48 +60,43 @@ class RealtorAgentFinderSpider(scrapy.Spider):
         print(designation)
 
         designation = designation.strip() if designation else None
+        full_name = designation
+
         is_broker = False
 
         if designation:
             if ' - ' in designation:
+                full_name = re.search(r'^(.*?)-', full_name).group(1)
                 designation = re.search(r' \- (.+)', designation).group(1)
             elif ', ' in designation:
+                full_name = re.search(r'^(.*?),', full_name).group(1)
                 designation = re.search(r'\, (.+)', designation).group(1)
             elif ' | ' in designation:
+                full_name = re.search(r'^(.*?)\|', full_name).group(1)
                 designation = re.search(r' \| (.+)', designation).group(1)
+
+            full_name = full_name.strip()
+            designation = designation.strip()
 
             broker_indicators = ['Broker', 'CEO', 'Owner', 'President', 'Chairman', 'Principal']
 
-            for indicator in broker_indicators:
-                if indicator.lower() in designation.lower():
-                    is_broker = True
-                    break
+            if ('-' . join(full_name.split(' '))).lower() in response.meta['teamUrl'].lower():
+                is_broker = True
+            else:
+                for indicator in broker_indicators:
+                    if indicator.lower() in designation.lower():
+                        is_broker = True
+                        break
         try:
             if is_broker:
-                l = BrokerLoader(item=RealtorBrokerItem(), response=response)
+                l = RealtorBrokerLoader(item=RealtorBrokerItem(), response=response)
                 l.add_value('teamUrl', response.meta.get('teamUrl'))
                 l.add_value('originUrl', response.url)
                 l.add_value('brokerTitle', designation)
                 l.add_value('search_keyword', response.meta.get('search_keyword'))
-                broker_name = contact_info_block.xpath(".//p[@class='modal-agent-name']/text()").extract_first()
-
-                if ' - ' in broker_name:
-                    l.add_xpath('brokerName',
-                                "//div[@id='modalcontactInfo']//p[@class='modal-agent-name']/text()",
-                                re=r'^(.*?)-')
-                elif ', ' in broker_name:
-                    l.add_xpath('brokerName',
-                                "//div[@id='modalcontactInfo']//p[@class='modal-agent-name']/text()",
-                                re=r'^(.*?),')
-                elif ' | ' in broker_name:
-                    l.add_xpath('brokerName',
-                                "//div[@id='modalcontactInfo']//p[@class='modal-agent-name']/text()",
-                                re=r'^(.*?)\|')
-
-                if not l.get_output_value('brokerName'):
-                    l.add_xpath('brokerName', "//div[@id='modalcontactInfo']//p[@class='modal-agent-name']/text()")
-
+                l.add_value('brokerName', full_name)
                 l.add_xpath('officeName', '//div[@id="popoverBrokerage"]//h4/text()')
+
                 mobileIndex = 1
 
                 for node in response.xpath('//div[@id="modalcontactInfo"]//li/i[contains(@class, "fa-phone")]/..'):
@@ -130,24 +125,7 @@ class RealtorAgentFinderSpider(scrapy.Spider):
                 l.add_value('originUrl', response.url)
                 l.add_value('designation', designation)
                 l.add_value('search_keyword', response.meta.get('search_keyword'))
-
-                agent_name = contact_info_block.xpath(".//p[@class='modal-agent-name']/text()").extract_first()
-
-                if ' - ' in agent_name:
-                    l.add_xpath('agentName',
-                                "//div[@id='modalcontactInfo']//p[@class='modal-agent-name']/text()",
-                                re=r'^(.*?)-')
-                elif ', ' in agent_name:
-                    l.add_xpath('agentName',
-                                "//div[@id='modalcontactInfo']//p[@class='modal-agent-name']/text()",
-                                re=r'^(.*?),')
-                elif ' | ' in agent_name:
-                    l.add_xpath('agentName',
-                                "//div[@id='modalcontactInfo']//p[@class='modal-agent-name']/text()",
-                                re=r'^(.*?)\|')
-
-                if not l.get_output_value('agentName'):
-                    l.add_xpath('agentName', "//div[@id='modalcontactInfo']//p[@class='modal-agent-name']/text()")
+                l.add_value('agentName', full_name)
 
                 for node in response.xpath('//div[@id="modalcontactInfo"]//li/i[contains(@class, "fa-phone")]/..'):
                     if 'Office:' in node.extract():
