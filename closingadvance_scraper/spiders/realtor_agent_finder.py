@@ -13,7 +13,7 @@ from closingadvance_scraper.loaders import AgentLoader, RealtorBrokerLoader
 class RealtorAgentFinderSpider(scrapy.Spider):
     name = 'realtor_agent_finder'
     allowed_domains = ['www.realtor.com']
-    search_url = 'https://www.realtor.com/realestateteam/{}'
+    search_url = 'https://www.realtor.com/realestateteam/teamname-{}'
 
     def start_requests(self):
         """
@@ -23,11 +23,16 @@ class RealtorAgentFinderSpider(scrapy.Spider):
             if zipcode['state'] in target_states:
                 url = self.search_url.format(zipcode['city'], zipcode['state'], zipcode['zip_code'])
                 yield scrapy.Request(url, callback=self.parse)
-        """
 
         for zipcode in zipcodes.filter_by(zipcodes.list_all(), active=True):
             url = self.search_url.format(zipcode['zip_code'])
             yield scrapy.Request(url, callback=self.parse, meta={'search_keyword': zipcode['zip_code']})
+        """
+        import string
+
+        for alphabet in list(string.ascii_lowercase):
+            url = self.search_url.format(alphabet)
+            yield scrapy.Request(url, callback=self.parse, meta={'search_keyword': alphabet})
 
     def parse(self, response):
         # self.logger.info('Crawled (%d) %s' % (response.status, response.url))
