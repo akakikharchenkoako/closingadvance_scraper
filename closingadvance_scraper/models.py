@@ -114,12 +114,9 @@ class TruliaListing(Listing):
 
 
 class RealtorListing(Listing):
-    agentName = CharField(null=True)
-    agentMobile = CharField(null=True, index=True)
-    agentProfile = CharField(null=True, index=True)
+    agent = ForeignKeyField(RealtorAgent)
     officeName = CharField(null=True)
-    officePhone = CharField(null=True, index=True)
-    verified = BooleanField(default=False, index=True)
+    officePhone = CharField(null=True)
     created = DateTimeField(default=datetime.datetime.now)
     modified = DateTimeField(null=True)
 
@@ -288,4 +285,20 @@ class Lender(Model):
 
     class Meta:
         db_table = 'lenders'
+        database = db
+
+
+class RealtorPriceHistory(Model):
+    id = CharField(null=False, primary_key=True, max_length=11)
+    listing = ForeignKeyField(ZillowListing)
+    listingDate = DateField(null=True)
+    listingEvent = CharField(null=True)
+    purchasePrice = IntegerField(null=True)
+    listingAgent = CharField(null=True)
+    listingSource = CharField(null=True)
+    created = DateTimeField(default=datetime.datetime.now)
+    modified = DateTimeField(null=True)
+
+    class Meta:
+        db_table = 'realtor_price_histories'
         database = db

@@ -46,9 +46,7 @@ class RedfinListingItem(ListingItem):
 
 
 class RealtorListingItem(ListingItem):
-    agentName = scrapy.Field()
-    agentMobile = scrapy.Field()
-    agentProfile = scrapy.Field()
+    agent_id = scrapy.Field()
     officeName = scrapy.Field()
     officePhone = scrapy.Field()
 
