@@ -641,7 +641,6 @@ class MySQLPipeline(object):
                         purchasePrice=entry.get('purchasePrice'),
                         listingEvent=entry.get('listingEvent'),
                         listingSource=entry.get('listingSource'),
-                        priceBySqFt=entry.get('priceBySqFt'),
                     )
                 else:
                     RealtorPriceHistory.update(
@@ -651,7 +650,6 @@ class MySQLPipeline(object):
                         purchasePrice=entry.get('purchasePrice'),
                         listingEvent=entry.get('listingEvent'),
                         listingSource=entry.get('listingSource'),
-                        priceBySqFt=entry.get('priceBySqFt'),
                         modified=datetime.datetime.now()
                     )
         else:
@@ -689,7 +687,6 @@ class MySQLPipeline(object):
                         purchasePrice=entry.get('purchasePrice'),
                         listingEvent=entry.get('listingEvent'),
                         listingSource=entry.get('listingSource'),
-                        priceBySqFt=entry.get('priceBySqFt'),
                     )
                 else:
                     RealtorPriceHistory.update(
@@ -699,7 +696,6 @@ class MySQLPipeline(object):
                         purchasePrice=entry.get('purchasePrice'),
                         listingEvent=entry.get('listingEvent'),
                         listingSource=entry.get('listingSource'),
-                        priceBySqFt=entry.get('priceBySqFt'),
                         modified=datetime.datetime.now()
                     )
 

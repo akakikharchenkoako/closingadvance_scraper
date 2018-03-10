@@ -296,10 +296,14 @@ class RealtorPriceHistory(Model):
     purchasePrice = IntegerField(null=True)
     listingAgent = CharField(null=True)
     listingSource = CharField(null=True)
-    priceBySqFt = IntegerField(null=True)
     created = DateTimeField(default=datetime.datetime.now)
     modified = DateTimeField(null=True)
 
     class Meta:
         db_table = 'realtor_price_histories'
         database = db
+    listingDate = DateField(null=True)
+    listingEvent = CharField(null=True)
+    purchasePrice = IntegerField(null=True)
+    listingAgent = CharField(null=True)
+    listingSource = CharField(null=True)

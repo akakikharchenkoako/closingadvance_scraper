@@ -101,14 +101,10 @@ class RealtorListingSpider(scrapy.Spider):
             purchasePrice = price_record.xpath('./td[3]/text()').extract_first()
             if purchasePrice:
                 purchasePrice = re.sub("[^\d\.]", "", purchasePrice)
-            priceBySqFt = price_record.xpath('./td[4]/text()').extract_first()
-            if priceBySqFt:
-                priceBySqFt = re.sub("[^\d\.]", "", priceBySqFt)
             listingSource = price_record.xpath('./td[5]/text()').extract_first()
             price_history_dict_list.append({'listingDate': listingDate,
                                             'listingEvent': listingEvent,
                                             'purchasePrice': purchasePrice,
-                                            'priceBySqFt': priceBySqFt,
                                             'listingSource': listingSource})
         if price_history_dict_list:
             l.add_value('priceHistories', price_history_dict_list)
