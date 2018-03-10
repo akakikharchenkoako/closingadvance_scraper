@@ -296,6 +296,7 @@ class RealtorPriceHistory(Model):
     purchasePrice = IntegerField(null=True)
     listingAgent = CharField(null=True)
     listingSource = CharField(null=True)
+    priceBySqFt = IntegerField(null=True)
     created = DateTimeField(default=datetime.datetime.now)
     modified = DateTimeField(null=True)
 

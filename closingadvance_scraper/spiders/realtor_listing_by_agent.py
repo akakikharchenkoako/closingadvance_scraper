@@ -4,6 +4,7 @@ import logging
 import scrapy
 import csv
 import os
+import re
 from urllib.parse import urljoin
 from closingadvance_scraper.locations import states
 from closingadvance_scraper.items import RealtorListingItem
@@ -92,5 +93,33 @@ class RealtorListingSpider(scrapy.Spider):
         l.add_value('agent_id', response.meta['id'])
         l.add_xpath('officeName', '//li[@data-label="additional-office-link"]/a/text()')
         l.add_xpath('officePhone', '//span[contains(@data-label, "office-phone")]/text()')
-
+        price_history_block_list = response.xpath('//div[@id="ldp-history-price"]//table/tbody/tr')
+        price_history_dict_list = []
+        for price_record in price_history_block_list:
+            listingDate = price_record.xpath('./td[1]/text()').extract_first()
+            listingEvent = price_record.xpath('./td[2]/text()').extract_first()
+            purchasePrice = price_record.xpath('./td[3]/text()').extract_first()
+            if purchasePrice:
+                purchasePrice = re.sub("[^\d\.]", "", purchasePrice)
+            priceBySqFt = price_record.xpath('./td[4]/text()').extract_first()
+            if priceBySqFt:
+                priceBySqFt = re.sub("[^\d\.]", "", priceBySqFt)
+            listingSource = price_record.xpath('./td[5]/text()').extract_first()
+            price_history_dict_list.append({'listingDate': listingDate,
+                                            'listingEvent': listingEvent,
+                                            'purchasePrice': purchasePrice,
+                                            'priceBySqFt': priceBySqFt,
+                                            'listingSource': listingSource})
+        if price_history_dict_list:
+            l.add_value('priceHistories', price_history_dict_list)
+        '''
+        PriceHistory.create(
+            id=id,
+            listing=listing,
+            listingDate=entry.get('listingDate'),
+            purchasePrice=entry.get('purchasePrice'),
+            listingEvent=entry.get('listingEvent'),
+                listingSource=entry.get('listingSource'),
+            listingAgent=entry.get('listingAgent')
+        '''
         yield l.load_item()
