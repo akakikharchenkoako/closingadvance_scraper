@@ -7,7 +7,8 @@
 
 import logging
 import datetime
-
+import ast
+import json
 from closingadvance_scraper.items import *
 from closingadvance_scraper.models import *
 
@@ -576,10 +577,10 @@ class MySQLPipeline(object):
         return item
 
     def process_realtor_listing_item(self, item, spider):
-        if item['listingStatus'] == 'Sold':
+        if item['listingStatus'].lower() == 'sold':
             try:
                 RealtorListing.get(RealtorListing.originUrl == item['originUrl'])
-            except ZillowListing.DoesNotExist:
+            except RealtorListing.DoesNotExist:
                 RealtorListing.create(
                     originUrl=item.get('originUrl'),
                     listingStatus=item.get('listingStatus'),
@@ -629,10 +630,10 @@ class MySQLPipeline(object):
                 officeName=item.get('officeName'),
                 officePhone=item.get('officePhone'),
             )
-            for idx, entry in enumerate(item.get('priceHistories')):
+            for idx, entry in enumerate(ast.literal_eval(item.get('priceHistories'))):
                 id = '{}{}'.format(listing.id, idx + 1)
                 try:
-                    RealtorPriceHistory.get(PriceHistory.id == id)
+                    RealtorPriceHistory.get(RealtorPriceHistory.id == id)
                 except RealtorPriceHistory.DoesNotExist:
                     RealtorPriceHistory.create(
                         id=id,
@@ -675,11 +676,11 @@ class MySQLPipeline(object):
             ).where(RealtorListing.originUrl == item['originUrl'])
             q.execute()
             listing = RealtorListing.get(RealtorListing.originUrl == item['originUrl'])
-            for idx, entry in enumerate(item.get('priceHistories')):
+            for idx, entry in enumerate(ast.literal_eval(item.get('priceHistories'))):
                 id = '{}{}'.format(listing.id, idx + 1)
                 try:
-                    RealtorPriceHistory.get(PriceHistory.id == id)
-                except PriceHistory.DoesNotExist:
+                    RealtorPriceHistory.get(RealtorPriceHistory.id == id)
+                except RealtorPriceHistory.DoesNotExist:
                     RealtorPriceHistory.create(
                         id=id,
                         listing=listing,

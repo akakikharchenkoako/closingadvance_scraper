@@ -290,7 +290,7 @@ class Lender(Model):
 
 class RealtorPriceHistory(Model):
     id = CharField(null=False, primary_key=True, max_length=11)
-    listing = ForeignKeyField(ZillowListing)
+    listing = ForeignKeyField(RealtorListing)
     listingDate = DateField(null=True)
     listingEvent = CharField(null=True)
     purchasePrice = IntegerField(null=True)
@@ -302,8 +302,3 @@ class RealtorPriceHistory(Model):
     class Meta:
         db_table = 'realtor_price_histories'
         database = db
-    listingDate = DateField(null=True)
-    listingEvent = CharField(null=True)
-    purchasePrice = IntegerField(null=True)
-    listingAgent = CharField(null=True)
-    listingSource = CharField(null=True)
