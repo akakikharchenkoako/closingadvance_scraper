@@ -63,6 +63,8 @@ class RealtorListingSpider(scrapy.Spider):
                 listing_status = 'Pending'
             elif "under contract" in listing_status.lower():
                 listing_status = 'Under Contract'
+            elif "contingent" in listing_status.lower():
+                listing_status = 'Contingent'
             else:
                 listing_status = None
 
