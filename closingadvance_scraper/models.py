@@ -302,3 +302,11 @@ class RealtorPriceHistory(Model):
     class Meta:
         db_table = 'realtor_price_histories'
         database = db
+
+
+class ListingStatus(Model):
+    status = CharField(null=False, unique=True)
+
+    class Meta:
+        db_table = 'listingStatus'
+        database = db
