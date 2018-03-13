@@ -1,18 +1,8 @@
 # Scraper Guides
 
-1. Export CSV from realtor_agents using following query before running realtor_listing_by_agent scraper
-```
-select count(b.id) from cag.realtor_brokers as a 
-inner join cag.realtor_agents as b on a.officePhone= b.officePhone
-where a.officePhone is not null and 
-b.officePhone is not null and 
-(a.brokerMobile is not null or a.brokerMobile2 is not null or a.brokerMobile3 is not null or a.brokerMobile4 is not null)
-```
-```
-select * from cag.realtor_agents as a
-inner join cag.realtor_brokers as b on a.officePhone = b.officePhone
-where a.officePhone is not null and b.officePhone is not null and 
-(b.brokerMobile is not null or b.brokerMobile2 is not null or b.brokerMobile3 is not null or b.brokerMobile4 is not null)
-```
-And realtor_listing_by_agent scraper uses this csv file as an input.
-This file should contain columns like id 
+1. Export CSV files with full data from realtor_agents and realtor_brokers
+1. Place realtor_agents.csv and realtor_brokers.csv files in closingadvance_scraper/external_data/input/ under the project dir.
+These will be input data to filter_realtor_agents.py which is filter out agents associate at least one brokers via office name, office address and
+office phone.
+We ignore any listing can't be reached to the broker mobile.
+1. Run filter_realtor_agents.py and this will generate 'filtered agent list.csv' inclosingadvance_scraper/external_data/output/ under the project dir.

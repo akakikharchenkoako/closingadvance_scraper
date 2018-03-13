@@ -119,6 +119,13 @@ class RealtorListing(Listing):
     officePhone = CharField(null=True)
     created = DateTimeField(default=datetime.datetime.now)
     modified = DateTimeField(null=True)
+    propertyTax = CharField(null=True)
+    medianDaysOnMarket = IntegerField(null=True)
+    daysOnMarket = IntegerField(null=True)
+    daysOnRealtor = IntegerField(null=True)
+    lastSoldPrice = CharField(null=True)
+    agentName = CharField(null=True)
+    agentMobile = CharField(null=True)
 
     class Meta:
         db_table = 'realtor_listings'
@@ -309,4 +316,23 @@ class ListingStatus(Model):
 
     class Meta:
         db_table = 'listingStatus'
+        database = db
+
+
+class RealtorListingAll(Listing):
+    agent = ForeignKeyField(RealtorAgent)
+    officeName = CharField(null=True)
+    officePhone = CharField(null=True)
+    created = DateTimeField(default=datetime.datetime.now)
+    modified = DateTimeField(null=True)
+    propertyTax = CharField(null=True)
+    medianDaysOnMarket = IntegerField(null=True)
+    daysOnMarket = IntegerField(null=True)
+    daysOnRealtor = IntegerField(null=True)
+    lastSoldPrice = CharField(null=True)
+    agentName = CharField(null=True)
+    agentMobile = CharField(null=True)
+
+    class Meta:
+        db_table = 'realtor_listings_all'
         database = db

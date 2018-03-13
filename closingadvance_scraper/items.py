@@ -49,6 +49,26 @@ class RealtorListingItem(ListingItem):
     agent_id = scrapy.Field()
     officeName = scrapy.Field()
     officePhone = scrapy.Field()
+    medianDaysOnMarket = scrapy.Field()
+    daysOnRealtor = scrapy.Field()
+    lastSoldPrice = scrapy.Field()
+    propertyTax = scrapy.Field()
+    brokers_list = scrapy.Field()
+    agentName = scrapy.Field()
+    agentMobile = scrapy.Field()
+
+
+class RealtorListingAllItem(ListingItem):
+    agent_id = scrapy.Field()
+    officeName = scrapy.Field()
+    officePhone = scrapy.Field()
+    medianDaysOnMarket = scrapy.Field()
+    daysOnRealtor = scrapy.Field()
+    lastSoldPrice = scrapy.Field()
+    propertyTax = scrapy.Field()
+    brokers_list = scrapy.Field()
+    agentName = scrapy.Field()
+    agentMobile = scrapy.Field()
 
 
 class AgentItem(scrapy.Item):

@@ -9,8 +9,8 @@ import re
 from urllib.parse import urljoin
 from closingadvance_scraper.locations import states
 from closingadvance_scraper.models import ListingStatus
-from closingadvance_scraper.items import RealtorListingItem
-from closingadvance_scraper.loaders import RealtorListingLoader
+from closingadvance_scraper.items import RealtorListingAllItem
+from closingadvance_scraper.loaders import RealtorListingAllLoader
 from closingadvance_scraper.processors import serialize_number, to_datetime
 from closingadvance_scraper.processors import serialize_number
 
@@ -21,22 +21,17 @@ logger.addHandler(logging.StreamHandler())
 from closingadvance_scraper.models import *
 
 
-class RealtorListingSpider(scrapy.Spider):
-    name = 'realtor_listing_by_agent'
+class RealtorListingAllSpider(scrapy.Spider):
+    name = 'realtor_listing_all_by_agent'
     allowed_domains = ['www.realtor.com']
     listingStatus = ['Active', 'Contingent', 'For Sale', 'New', 'Pending', 'Sold', 'Under Contract']
 
     def start_requests(self):
-        '''
         self.listingStatus = [user._data['status'] for user in ListingStatus.select()]
         input_file = csv.DictReader(open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/filtered agent list.csv"), delimiter=";")
 
         for row in input_file:
             yield scrapy.Request(row["originUrl"], callback=self.parse, meta={'agent_id': row["id"], 'brokers_list': row["brokers_list"]})
-        '''
-        yield scrapy.Request('https://www.realtor.com/realestateandhomes-detail/2830-Sombrero-Ln_Fort-Collins_CO_80525_M13066-96328',
-                             callback=self.parse_item,
-                             meta={'agent_id': '1', 'brokers_list': '2'})
 
     def parse(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
@@ -51,7 +46,7 @@ class RealtorListingSpider(scrapy.Spider):
 
         property_type = response.xpath('//li[@class="ldp-key-fact-item"]/div[text()="Type"]/following-sibling::div/text()').extract_first()
 
-        if 'single family' not in property_type.lower():
+        if 'single family' not in property_type.lower() and False and False and False:
             self.logger.info('Not Single Family %s' % response.url)
             return
 
@@ -66,11 +61,11 @@ class RealtorListingSpider(scrapy.Spider):
                     listing_status = status
                     break
 
-        if not isListingStatusFound:
+        if not isListingStatusFound and False and False and False:
             self.logger.info('Not For Sale or Pending %s' % response.url)
             return
 
-        l = RealtorListingLoader(item=RealtorListingItem(), response=response)
+        l = RealtorListingAllLoader(item=RealtorListingAllItem(), response=response)
         l.add_value('originUrl', response.url)
         l.add_value('propertyType', property_type)
         l.add_value('listingStatus', listing_status)
@@ -168,6 +163,8 @@ class RealtorListingSpider(scrapy.Spider):
             l.add_value('listingUpdated', to_datetime(listingUpdated).strftime("%Y-%m-%d"))
         l.add_value('agent_id', response.meta['agent_id'])
         l.add_value('brokers_list', response.meta['brokers_list'])
+        l.add_xpath('agentName', '//span[contains(@data-label, "agent-name")]/text()')
+        l.add_xpath('agentMobile', '//span[contains(@data-label, "agent-phone")]/text()')
         l.add_xpath('officeName', '//li[@data-label="additional-office-link"]/a/text()')
         l.add_xpath('officePhone', '//span[contains(@data-label, "office-phone")]/text()')
         price_history_block_list = response.xpath('//div[@id="ldp-history-price"]//table/tbody/tr')

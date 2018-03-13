@@ -66,6 +66,8 @@ class MySQLPipeline(object):
             return self.process_realtor_broker_item(item, spider)
         elif isinstance(item, RealtorListingItem):
             return self.process_realtor_listing_item(item, spider)
+        elif isinstance(item, RealtorListingAllItem):
+            return self.process_realtor_listing_all_item(item, spider)
         else:
             return item
 
@@ -577,36 +579,6 @@ class MySQLPipeline(object):
         return item
 
     def process_realtor_listing_item(self, item, spider):
-        if item['listingStatus'].lower() == 'sold':
-            try:
-                RealtorListing.get(RealtorListing.originUrl == item['originUrl'])
-            except RealtorListing.DoesNotExist:
-                RealtorListing.create(
-                    originUrl=item.get('originUrl'),
-                    listingStatus=item.get('listingStatus'),
-                    purchasePrice=item.get('purchasePrice'),
-                    mlsId=item.get('mlsId'),
-                    zipCode=item.get('zipCode'),
-                    daysOnMarket=item.get('daysOnMarket'),
-                    yearBuilt=item.get('yearBuilt'),
-                    beds=item.get('beds'),
-                    baths=item.get('baths'),
-                    sqft=item.get('sqft'),
-                    lotSize=item.get('lotSize'),
-                    photoCount=item.get('photoCount'),
-                    listingUpdated=item.get('listingUpdated'),
-                    openHouse=item.get('openHouse'),
-                    propertyAddress=item.get('propertyAddress'),
-                    agent=item.get('agent'),
-                    officeName=item.get('officeName'),
-                    officePhone=item.get('officePhone')),
-            else:
-                q = RealtorListing.update(
-                    listingStatus=item.get('listingStatus')
-                ).where(RealtorListing.originUrl == item['originUrl'])
-                q.execute()
-            return item
-
         try:
             RealtorListing.get(RealtorListing.originUrl == item['originUrl'])
         except RealtorListing.DoesNotExist:
@@ -630,31 +602,90 @@ class MySQLPipeline(object):
                 officeName=item.get('officeName'),
                 officePhone=item.get('officePhone'),
             )
-            for idx, entry in enumerate(ast.literal_eval(item.get('priceHistories'))):
-                id = '{}{}'.format(listing.id, idx + 1)
-                try:
-                    RealtorPriceHistory.get(RealtorPriceHistory.id == id)
-                except RealtorPriceHistory.DoesNotExist:
-                    RealtorPriceHistory.create(
-                        id=id,
-                        listing=listing,
-                        listingDate=entry.get('listingDate'),
-                        purchasePrice=entry.get('purchasePrice'),
-                        listingEvent=entry.get('listingEvent'),
-                        listingSource=entry.get('listingSource'),
-                    )
-                else:
-                    RealtorPriceHistory.update(
-                        id=id,
-                        listing=listing,
-                        listingDate=entry.get('listingDate'),
-                        purchasePrice=entry.get('purchasePrice'),
-                        listingEvent=entry.get('listingEvent'),
-                        listingSource=entry.get('listingSource'),
-                        modified=datetime.datetime.now()
-                    )
+            if 'sold' not in item['listingStatus'].lower():
+                for idx, entry in enumerate(ast.literal_eval(item.get('priceHistories'))):
+                    id = '{}{}'.format(listing.id, idx + 1)
+                    try:
+                        RealtorPriceHistory.get(RealtorPriceHistory.id == id)
+                    except RealtorPriceHistory.DoesNotExist:
+                        RealtorPriceHistory.create(
+                            id=id,
+                            listing=listing,
+                            listingDate=entry.get('listingDate'),
+                            purchasePrice=entry.get('purchasePrice'),
+                            listingEvent=entry.get('listingEvent'),
+                            listingSource=entry.get('listingSource'),
+                        )
+                    else:
+                        RealtorPriceHistory.update(
+                            id=id,
+                            listing=listing,
+                            listingDate=entry.get('listingDate'),
+                            purchasePrice=entry.get('purchasePrice'),
+                            listingEvent=entry.get('listingEvent'),
+                            listingSource=entry.get('listingSource'),
+                            modified=datetime.datetime.now()
+                        )
         else:
-            q = RealtorListing.update(
+            if 'sold' in item['listingStatus'].lower():
+                q = RealtorListing.update(
+                    listingStatus=item.get('listingStatus')
+                ).where(RealtorListing.originUrl == item['originUrl'])
+                q.execute()
+            else:
+                q = RealtorListing.update(
+                    listingStatus=item.get('listingStatus'),
+                    purchasePrice=item.get('purchasePrice'),
+                    mlsId=item.get('mlsId'),
+                    zipCode=item.get('zipCode'),
+                    daysOnMarket=item.get('daysOnMarket'),
+                    yearBuilt=item.get('yearBuilt'),
+                    beds=item.get('beds'),
+                    baths=item.get('baths'),
+                    sqft=item.get('sqft'),
+                    lotSize=item.get('lotSize'),
+                    photoCount=item.get('photoCount'),
+                    listingUpdated=item.get('listingUpdated'),
+                    openHouse=item.get('openHouse'),
+                    propertyAddress=item.get('propertyAddress'),
+                    agent=item.get('agent'),
+                    officeName=item.get('officeName'),
+                    officePhone=item.get('officePhone'),
+                    modified=datetime.datetime.now()
+                ).where(RealtorListing.originUrl == item['originUrl'])
+                q.execute()
+                listing = RealtorListing.get(RealtorListing.originUrl == item['originUrl'])
+                for idx, entry in enumerate(ast.literal_eval(item.get('priceHistories'))):
+                    id = '{}{}'.format(listing.id, idx + 1)
+                    try:
+                        RealtorPriceHistory.get(RealtorPriceHistory.id == id)
+                    except RealtorPriceHistory.DoesNotExist:
+                        RealtorPriceHistory.create(
+                            id=id,
+                            listing=listing,
+                            listingDate=entry.get('listingDate'),
+                            purchasePrice=entry.get('purchasePrice'),
+                            listingEvent=entry.get('listingEvent'),
+                            listingSource=entry.get('listingSource'),
+                        )
+                    else:
+                        RealtorPriceHistory.update(
+                            id=id,
+                            listing=listing,
+                            listingDate=entry.get('listingDate'),
+                            purchasePrice=entry.get('purchasePrice'),
+                            listingEvent=entry.get('listingEvent'),
+                            listingSource=entry.get('listingSource'),
+                            modified=datetime.datetime.now()
+                        )
+        return item
+
+    def process_realtor_listing_all_item(self, item, spider):
+        try:
+            RealtorListingAll.get(RealtorListingAll.originUrl == item['originUrl'])
+        except RealtorListingAll.DoesNotExist:
+            listing = RealtorListingAll.create(
+                originUrl=item.get('originUrl'),
                 listingStatus=item.get('listingStatus'),
                 purchasePrice=item.get('purchasePrice'),
                 mlsId=item.get('mlsId'),
@@ -669,35 +700,48 @@ class MySQLPipeline(object):
                 listingUpdated=item.get('listingUpdated'),
                 openHouse=item.get('openHouse'),
                 propertyAddress=item.get('propertyAddress'),
-                agent=item.get('agent'),
+                agent=item.get('agent_id'),
                 officeName=item.get('officeName'),
                 officePhone=item.get('officePhone'),
-                modified=datetime.datetime.now()
-            ).where(RealtorListing.originUrl == item['originUrl'])
-            q.execute()
-            listing = RealtorListing.get(RealtorListing.originUrl == item['originUrl'])
-            for idx, entry in enumerate(ast.literal_eval(item.get('priceHistories'))):
-                id = '{}{}'.format(listing.id, idx + 1)
-                try:
-                    RealtorPriceHistory.get(RealtorPriceHistory.id == id)
-                except RealtorPriceHistory.DoesNotExist:
-                    RealtorPriceHistory.create(
-                        id=id,
-                        listing=listing,
-                        listingDate=entry.get('listingDate'),
-                        purchasePrice=entry.get('purchasePrice'),
-                        listingEvent=entry.get('listingEvent'),
-                        listingSource=entry.get('listingSource'),
-                    )
-                else:
-                    RealtorPriceHistory.update(
-                        id=id,
-                        listing=listing,
-                        listingDate=entry.get('listingDate'),
-                        purchasePrice=entry.get('purchasePrice'),
-                        listingEvent=entry.get('listingEvent'),
-                        listingSource=entry.get('listingSource'),
-                        modified=datetime.datetime.now()
-                    )
-
+                agentMobile=item.get('agentMobile'),
+                agentName=item.get('agentName'),
+                medianDaysOnMarket=item.get('medianDaysOnMarket'),
+                daysOnRealtor=item.get('daysOnRealtor'),
+                propertyTax=item.get('propertyTax'),
+                lastSoldPrice=item.get('lastSoldPrice'),
+            )
+        else:
+            if 'sold' in item['listingStatus'].lower():
+                q = RealtorListingAll.update(
+                    listingStatus=item.get('listingStatus')
+                ).where(RealtorListingAll.originUrl == item['originUrl'])
+                q.execute()
+            else:
+                q = RealtorListingAll.update(
+                    listingStatus=item.get('listingStatus'),
+                    purchasePrice=item.get('purchasePrice'),
+                    mlsId=item.get('mlsId'),
+                    zipCode=item.get('zipCode'),
+                    daysOnMarket=item.get('daysOnMarket'),
+                    yearBuilt=item.get('yearBuilt'),
+                    beds=item.get('beds'),
+                    baths=item.get('baths'),
+                    sqft=item.get('sqft'),
+                    lotSize=item.get('lotSize'),
+                    photoCount=item.get('photoCount'),
+                    listingUpdated=item.get('listingUpdated'),
+                    openHouse=item.get('openHouse'),
+                    propertyAddress=item.get('propertyAddress'),
+                    agent=item.get('agent_id'),
+                    officeName=item.get('officeName'),
+                    officePhone=item.get('officePhone'),
+                    agentMobile=item.get('agentMobile'),
+                    agentName=item.get('agentName'),
+                    medianDaysOnMarket=item.get('medianDaysOnMarket'),
+                    daysOnRealtor=item.get('daysOnRealtor'),
+                    propertyTax=item.get('propertyTax'),
+                    lastSoldPrice=item.get('lastSoldPrice'),
+                    modified=datetime.datetime.now()
+                ).where(RealtorListingAll.originUrl == item['originUrl'])
+                q.execute()
         return item
