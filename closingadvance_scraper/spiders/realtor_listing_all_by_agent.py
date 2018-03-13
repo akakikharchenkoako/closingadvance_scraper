@@ -31,7 +31,7 @@ class RealtorListingAllSpider(scrapy.Spider):
         input_file = csv.DictReader(open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/filtered agent list.csv"), delimiter=";")
 
         for row in input_file:
-            yield scrapy.Request(row["originUrl"], callback=self.parse, meta={'agent_id': row["id"], 'brokers_list': row["brokers_list"]})
+            yield scrapy.Request(row["originUrl"], callback=self.parse, meta={'agent_id': row["id"]})
 
     def parse(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
@@ -39,7 +39,7 @@ class RealtorListingAllSpider(scrapy.Spider):
         for property in response.xpath('//div[@id="section_for_sale_all_wrap"]//div[@class="aspect-content"]//div[@class="listing-photo"]//a'):
             link = property.xpath('./@href').extract_first()
             if link:
-                yield response.follow(link, self.parse_item, meta={'agent_id': response.meta['agent_id'], 'brokers_list': response.meta['1 2']})
+                yield response.follow(link, self.parse_item, meta={'agent_id': response.meta['agent_id']})
 
     def parse_item(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
@@ -162,7 +162,6 @@ class RealtorListingAllSpider(scrapy.Spider):
         if listingUpdated and listingUpdated.strip():
             l.add_value('listingUpdated', to_datetime(listingUpdated).strftime("%Y-%m-%d"))
         l.add_value('agent_id', response.meta['agent_id'])
-        l.add_value('brokers_list', response.meta['brokers_list'])
         l.add_xpath('agentName', '//span[contains(@data-label, "agent-name")]/text()')
         l.add_xpath('agentMobile', '//span[contains(@data-label, "agent-phone")]/text()')
         l.add_xpath('officeName', '//li[@data-label="additional-office-link"]/a/text()')
