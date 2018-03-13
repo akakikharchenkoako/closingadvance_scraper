@@ -28,7 +28,7 @@ class RealtorListingAllSpider(scrapy.Spider):
 
     def start_requests(self):
         self.listingStatus = [user._data['status'] for user in ListingStatus.select()]
-        input_file = csv.DictReader(open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/filtered agent list.csv"), delimiter=";")
+        input_file = csv.DictReader(open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/filtered agent list.csv"), delimiter=";")
 
         for row in input_file:
             yield scrapy.Request(row["originUrl"], callback=self.parse, meta={'agent_id': row["id"], 'brokers_list': row["brokers_list"]})
