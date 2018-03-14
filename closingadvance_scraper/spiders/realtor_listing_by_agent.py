@@ -61,7 +61,7 @@ class RealtorListingSpider(scrapy.Spider):
 
         if listing_status:
             for status in self.listingStatus:
-                if status.lower().strip() in listing_status.lower():
+                if status.lower() in listing_status.lower():
                     isListingStatusFound = True
                     listing_status = status
                     break
