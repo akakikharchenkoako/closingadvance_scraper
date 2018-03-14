@@ -27,9 +27,8 @@ class RealtorListingSpider(scrapy.Spider):
     listingStatus = ['Active', 'Contingent', 'For Sale', 'New', 'Pending', 'Sold', 'Under Contract']
 
     def start_requests(self):
-        '''
         self.listingStatus = [user._data['status'] for user in ListingStatus.select()]
-        input_file = csv.DictReader(open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/filtered agent list.csv"), delimiter=";")
+        input_file = csv.DictReader(open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/filtered agent list.csv"), delimiter=";")
 
         for row in input_file:
             yield scrapy.Request(row["originUrl"], callback=self.parse, meta={'agent_id': row["id"], 'brokers_list': row["brokers_list"]})
@@ -37,6 +36,7 @@ class RealtorListingSpider(scrapy.Spider):
         yield scrapy.Request('https://www.realtor.com/realestateandhomes-detail/2830-Sombrero-Ln_Fort-Collins_CO_80525_M13066-96328',
                              callback=self.parse_item,
                              meta={'agent_id': '1', 'brokers_list': '2'})
+        '''
 
     def parse(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
@@ -44,7 +44,7 @@ class RealtorListingSpider(scrapy.Spider):
         for property in response.xpath('//div[@id="section_for_sale_all_wrap"]//div[@class="aspect-content"]//div[@class="listing-photo"]//a'):
             link = property.xpath('./@href').extract_first()
             if link:
-                yield response.follow(link, self.parse_item, meta={'agent_id': response.meta['agent_id'], 'brokers_list': response.meta['1 2']})
+                yield response.follow(link, self.parse_item, meta={'agent_id': response.meta['agent_id'], 'brokers_list': response.meta['brokers_list']})
 
     def parse_item(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
