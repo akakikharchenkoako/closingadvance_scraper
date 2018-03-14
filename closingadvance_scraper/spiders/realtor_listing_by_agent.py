@@ -103,7 +103,7 @@ class RealtorListingSpider(scrapy.Spider):
             if purchasePrice.isdigit() and int(purchasePrice) > 150000 and int(purchasePrice) < 550000:
                 l.add_value('purchasePrice', purchasePrice)
                 isPurchasePriceIsInRange = True
-        if not isPurchasePriceIsInRange and False and False and False:
+        if not isPurchasePriceIsInRange:
             return
         lastSoldPrice = response.xpath('//span[text()="Last Sold for"]/following-sibling::span[@itemprop="price"]/@content').extract_first()
         if lastSoldPrice:
@@ -117,7 +117,7 @@ class RealtorListingSpider(scrapy.Spider):
             if yearBuilt >= 1980 and yearBuilt <= 2016:
                 l.add_value('yearBuilt', str(yearBuilt))
                 isYearBuiltIsInRange = True
-        if not isYearBuiltIsInRange and False and False and False:
+        if not isYearBuiltIsInRange:
             return
         beds = response.xpath('//div[@id="ldp-property-meta"]//li[@data-label="property-meta-beds"]/span/text()').extract_first()
         isBedsIsInRange = False
@@ -126,7 +126,7 @@ class RealtorListingSpider(scrapy.Spider):
             if beds >= 3:
                 l.add_value('beds', str(beds))
                 isBedsIsInRange = True
-        if not isBedsIsInRange and False and False and False:
+        if not isBedsIsInRange:
             return
         l.add_xpath('baths', '//div[@id="ldp-property-meta"]//li[@data-label="property-meta-bath"]/span/text()')
         isSqftIsInRange = False
@@ -138,7 +138,7 @@ class RealtorListingSpider(scrapy.Spider):
                 if sqft >= 1250:
                     l.add_value('sqft', str(sqft))
                     isSqftIsInRange = True
-        if not isSqftIsInRange and False and False and False:
+        if not isSqftIsInRange:
             return
         lotSize = response.xpath('//li[@data-label="property-meta-lotsize"]')
         isSqftLot = 'sqft lot' in ' ' . join(lotSize.xpath('./text()').extract())
@@ -157,7 +157,7 @@ class RealtorListingSpider(scrapy.Spider):
                     if float(lotSize) <= 2.0 and float(lotSize) >= 0:
                         l.add_value('lotSize', str(int(43560 * float(lotSize))))
                         isLotSizeIsInRange = True
-        if not isLotSizeIsInRange and False and False and False:
+        if not isLotSizeIsInRange:
             return
         l.add_xpath('photoCount', '//a[@id="hero-view-photo"]/span[3]/text()', re=r'([0-9\,]+)')
         open_house = response.xpath('//div[contains(@class, "open-house-calendar")]//time/text()').extract_first()
