@@ -579,6 +579,7 @@ class MySQLPipeline(object):
         return item
 
     def process_realtor_listing_item(self, item, spider):
+        agent = RealtorAgent.get(RealtorAgent.id == item['agent_id'])
         try:
             RealtorListing.get(RealtorListing.originUrl == item['originUrl'])
         except RealtorListing.DoesNotExist:
@@ -598,7 +599,7 @@ class MySQLPipeline(object):
                 listingUpdated=item.get('listingUpdated'),
                 openHouse=item.get('openHouse'),
                 propertyAddress=item.get('propertyAddress'),
-                agent=item.get('agent_id'),
+                agent=agent,
                 officeName=item.get('officeName'),
                 officePhone=item.get('officePhone'),
             )
@@ -648,7 +649,7 @@ class MySQLPipeline(object):
                     listingUpdated=item.get('listingUpdated'),
                     openHouse=item.get('openHouse'),
                     propertyAddress=item.get('propertyAddress'),
-                    agent=item.get('agent'),
+                    agent=agent,
                     officeName=item.get('officeName'),
                     officePhone=item.get('officePhone'),
                     modified=datetime.datetime.now()
@@ -678,6 +679,14 @@ class MySQLPipeline(object):
                             listingSource=entry.get('listingSource'),
                             modified=datetime.datetime.now()
                         )
+
+        for broker_id in item.get('brokers_list').split(' '):
+            broker = RealtorBroker.get(RealtorBroker.id == broker_id)
+            RealtorListinBroker.create(
+                listing=listing,
+                broker=broker,
+            )
+
         return item
 
     def process_realtor_listing_all_item(self, item, spider):

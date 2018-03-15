@@ -68,6 +68,7 @@ class ZillowBroker(Broker):
 
 
 class RealtorBroker(Broker):
+    id = IntegerField(null=False, primary_key=True)
     teamUrl = CharField(null=True)
     search_keyword = CharField(null=True)
     created = DateTimeField(default=datetime.datetime.now)
@@ -335,4 +336,13 @@ class RealtorListingAll(Listing):
 
     class Meta:
         db_table = 'realtor_listings_all'
+        database = db
+
+
+class RealtorListinBroker(Listing):
+    listing = ForeignKeyField(RealtorListing)
+    broker = ForeignKeyField(RealtorBroker)
+
+    class Meta:
+        db_table = 'realtor_listing_broker'
         database = db
