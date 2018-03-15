@@ -602,6 +602,12 @@ class MySQLPipeline(object):
                 agent=agent,
                 officeName=item.get('officeName'),
                 officePhone=item.get('officePhone'),
+                agentMobile=item.get('agentMobile'),
+                agentName=item.get('agentName'),
+                medianDaysOnMarket=item.get('medianDaysOnMarket'),
+                daysOnRealtor=item.get('daysOnRealtor'),
+                propertyTax=item.get('propertyTax'),
+                lastSoldPrice=item.get('lastSoldPrice'),
             )
             if 'sold' not in item['listingStatus'].lower():
                 for idx, entry in enumerate(ast.literal_eval(item.get('priceHistories'))):
@@ -652,6 +658,12 @@ class MySQLPipeline(object):
                     agent=agent,
                     officeName=item.get('officeName'),
                     officePhone=item.get('officePhone'),
+                    agentMobile=item.get('agentMobile'),
+                    agentName=item.get('agentName'),
+                    medianDaysOnMarket=item.get('medianDaysOnMarket'),
+                    daysOnRealtor=item.get('daysOnRealtor'),
+                    propertyTax=item.get('propertyTax'),
+                    lastSoldPrice=item.get('lastSoldPrice'),
                     modified=datetime.datetime.now()
                 ).where(RealtorListing.originUrl == item['originUrl'])
                 q.execute()

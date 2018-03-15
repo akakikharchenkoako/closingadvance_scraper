@@ -168,6 +168,8 @@ class RealtorListingSpider(scrapy.Spider):
             l.add_value('listingUpdated', to_datetime(listingUpdated).strftime("%Y-%m-%d"))
         l.add_value('agent_id', response.meta['agent_id'])
         l.add_value('brokers_list', response.meta['brokers_list'])
+        l.add_xpath('agentName', '//span[contains(@data-label, "agent-name")]/text()')
+        l.add_xpath('agentMobile', '//span[contains(@data-label, "agent-phone")]/text()')
         l.add_xpath('officeName', '//li[@data-label="additional-office-link"]/a/text()')
         l.add_xpath('officePhone', '//span[contains(@data-label, "office-phone")]/text()')
         price_history_block_list = response.xpath('//div[@id="ldp-history-price"]//table/tbody/tr')
