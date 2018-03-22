@@ -27,7 +27,7 @@ class ZillowLendersAllSpider(scrapy.Spider):
     def start_requests(self):
         target_states = [state['abbr'] for state in states]
 
-        for state_abbr in target_states[:1]:
+        for state_abbr in target_states:
             yield scrapy.Request(self.start_url.format(state_abbr, 1000), callback=self.parse_state_cities_json)
 
     def parse_state_cities_json(self, response):
@@ -35,7 +35,7 @@ class ZillowLendersAllSpider(scrapy.Spider):
 
         cities_list = json.loads(response.text)["cityNames"]
 
-        for city in cities_list[:1]:
+        for city in cities_list:
             payload = {
                 'fields': ['screenName'],
                 'location': city,
