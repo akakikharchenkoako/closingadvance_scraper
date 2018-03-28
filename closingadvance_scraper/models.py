@@ -362,6 +362,7 @@ class RealtorListingJulien(Model):
     lotSize = IntegerField(null=True)
     photoCount = IntegerField(null=True)
     purchasePrice = FloatField(null=True)
+    currentPrice = FloatField(null=True)
     propertyAddress = CharField(null=True)
     zipCode = CharField(null=True)
     moreExpensiveThanNearbyProperties = FloatField(null=True)

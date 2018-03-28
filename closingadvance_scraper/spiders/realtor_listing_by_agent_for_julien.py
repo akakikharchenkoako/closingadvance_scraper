@@ -46,10 +46,16 @@ class RealtorListingAllSpider(scrapy.Spider):
                 soldDate = listing_thumbnail.xpath('.//div[@class="listing-photo-label"]/span/text()').extract()[1]
                 soldDate = datetime.datetime.strptime(soldDate, '%A, %B %d, %Y').strftime("%Y-%m-%d")
                 worked = listing_thumbnail.xpath('.//div[@class="listing-photo-label"]/span/text()').extract()[2]
+                purchasePrice = listing_thumbnail.xpath('.//div[@class="listing-info"]//li[@class="listing-info-price"]/text()').extract_first()
+                if purchasePrice:
+                    purchasePrice = re.sub("[^\d\.]", "", purchasePrice)
+                    if purchasePrice.isdigit():
+                        purchasePrice = purchasePrice
                 meta_payload = {'agent_id': response.meta['agent_id'],
                                 'status': status,
                                 'soldDate': soldDate,
-                                'worked': worked}
+                                'worked': worked,
+                                'purchasePrice': purchasePrice}
                 yield response.follow(link, self.parse_listing, meta=meta_payload)
 
     def parse_listing(self, response):
@@ -123,16 +129,18 @@ class RealtorListingAllSpider(scrapy.Spider):
         if not isLotSizeIsInRange and False and False and False:
             return
         l.add_xpath('photoCount', '//a[@id="hero-view-photo"]/span[3]/text()', re=r'([0-9\,]+)')
-        purchasePrice = response.xpath('//div[@class="ldp-header-price"]//span[@itemprop="price"]/text()').extract_first()
+        purchasePrice = response.meta['purchasePrice']
         isPurchasePriceIsInRange = False
-        if purchasePrice:
-            purchasePrice = re.sub("[^\d\.]", "", purchasePrice)
-            if purchasePrice.isdigit():
-                l.add_value('purchasePrice', purchasePrice)
-                if int(purchasePrice) > 150000 and int(purchasePrice) < 550000:
-                    isPurchasePriceIsInRange = True
+        l.add_value('purchasePrice', purchasePrice)
+        if int(purchasePrice) > 150000 and int(purchasePrice) < 550000:
+            isPurchasePriceIsInRange = True
         if not isPurchasePriceIsInRange and False and False and False:
             return
+        currentPrice = response.xpath('//div[@class="ldp-header-price"]//span[@itemprop="price"]/text()').extract_first()
+        if currentPrice:
+            currentPrice = re.sub("[^\d\.]", "", currentPrice)
+            if currentPrice.isdigit():
+                l.add_value('currentPrice', currentPrice)
         l.add_xpath('propertyAddress', '//div[@id="ldp-address"]/@content')
         l.add_xpath('zipCode', '//span[@itemprop="postalCode"]/text()')
         moreExpensiveThanNearbyProperties = response.xpath('//span[contains(text(), "More expensive than")]'
