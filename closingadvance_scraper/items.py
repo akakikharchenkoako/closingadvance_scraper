@@ -71,6 +71,36 @@ class RealtorListingAllItem(ListingItem):
     agentMobile = scrapy.Field()
 
 
+class RealtorListingForJulienItem(scrapy.Item):
+    originUrl = scrapy.Field()
+    agent_id = scrapy.Field()
+    agentName = scrapy.Field()
+    agentMobile = scrapy.Field()
+    status = scrapy.Field()
+    soldDate = scrapy.Field()
+    worked = scrapy.Field()
+    beds = scrapy.Field()
+    baths = scrapy.Field()
+    sqft = scrapy.Field()
+    lotSize = scrapy.Field()
+    photoCount = scrapy.Field()
+    purchasePrice = scrapy.Field()
+    propertyAddress = scrapy.Field()
+    zipCode = scrapy.Field()
+    moreExpensiveThanNearbyProperties = scrapy.Field()
+    lessExpensiveThanNearbyProperties = scrapy.Field()
+    daysOnMarket = scrapy.Field()
+    soldHigherThanTheListedPrice = scrapy.Field()
+    soldLowerThanTheListedPrice = scrapy.Field()
+    pricePerSqFt = scrapy.Field()
+    propertyType = scrapy.Field()
+    yearBuilt = scrapy.Field()
+    medianListingPrice = scrapy.Field()
+    medianSalePrice = scrapy.Field()
+    medianDaysOnMarket = scrapy.Field()
+    averagePricePerSqFt = scrapy.Field()
+
+
 class AgentItem(scrapy.Item):
     originUrl = scrapy.Field()
     brokerUrl = scrapy.Field()

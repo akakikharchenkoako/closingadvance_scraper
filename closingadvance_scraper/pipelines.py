@@ -68,6 +68,8 @@ class MySQLPipeline(object):
             return self.process_realtor_listing_item(item, spider)
         elif isinstance(item, RealtorListingAllItem):
             return self.process_realtor_listing_all_item(item, spider)
+        elif isinstance(item, RealtorListingForJulienItem):
+            return self.process_realtor_listing_julien_item(item, spider)
         else:
             return item
 
@@ -765,4 +767,71 @@ class MySQLPipeline(object):
                     modified=datetime.datetime.now()
                 ).where(RealtorListingAll.originUrl == item['originUrl'])
                 q.execute()
+        return item
+
+    def process_realtor_listing_julien_item(self, item, spider):
+        try:
+            RealtorListingJulien.get(RealtorListingJulien.originUrl == item['originUrl'])
+        except RealtorListingJulien.DoesNotExist:
+            try:
+                listing = RealtorListingJulien.create(
+                    originUrl=item.get('originUrl'),
+                    agent=item.get('agent_id'),
+                    agentName=item.get('agentName'),
+                    agentMobile=item.get('agentMobile'),
+                    status=item.get('status'),
+                    soldDate=item.get('soldDate'),
+                    worked=item.get('worked'),
+                    beds=item.get('beds'),
+                    baths=item.get('baths'),
+                    sqft=item.get('sqft'),
+                    lotSize=item.get('lotSize'),
+                    photoCount=item.get('photoCount'),
+                    purchasePrice=item.get('purchasePrice'),
+                    propertyAddress=item.get('propertyAddress'),
+                    zipCode=item.get('zipCode'),
+                    moreExpensiveThanNearbyProperties=item.get('moreExpensiveThanNearbyProperties'),
+                    lessExpensiveThanNearbyProperties=item.get('lessExpensiveThanNearbyProperties'),
+                    daysOnMarket=item.get('daysOnMarket'),
+                    soldHigherThanTheListedPrice=item.get('soldHigherThanTheListedPrice'),
+                    soldLowerThanTheListedPrice=item.get('soldLowerThanTheListedPrice'),
+                    pricePerSqFt=item.get('pricePerSqFt'),
+                    propertyType=item.get('propertyType'),
+                    yearBuilt=item.get('yearBuilt'),
+                    medianListingPrice=item.get('medianListingPrice'),
+                    medianSalePrice=item.get('medianSalePrice'),
+                    medianDaysOnMarket=item.get('medianDaysOnMarket'),
+                    averagePricePerSqFt=item.get('averagePricePerSqFt'),
+                )
+            except Exception as e:
+                print(e)
+                pass
+        else:
+            q = RealtorListingJulien.update(
+                status=item.get('status'),
+                soldDate=item.get('soldDate'),
+                worked=item.get('worked'),
+                beds=item.get('beds'),
+                baths=item.get('baths'),
+                sqft=item.get('sqft'),
+                lotSize=item.get('lotSize'),
+                photoCount=item.get('photoCount'),
+                purchasePrice=item.get('purchasePrice'),
+                propertyAddress=item.get('propertyAddress'),
+                zipCode=item.get('zipCode'),
+                moreExpensiveThanNearbyProperties=item.get('moreExpensiveThanNearbyProperties'),
+                lessExpensiveThanNearbyProperties=item.get('lessExpensiveThanNearbyProperties'),
+                daysOnMarket=item.get('daysOnMarket'),
+                soldHigherThanTheListedPrice=item.get('soldHigherThanTheListedPrice'),
+                soldLowerThanTheListedPrice=item.get('soldLowerThanTheListedPrice'),
+                pricePerSqFt=item.get('pricePerSqFt'),
+                propertyType=item.get('propertyType'),
+                yearBuilt=item.get('yearBuilt'),
+                medianListingPrice=item.get('medianListingPrice'),
+                medianSalePrice=item.get('medianSalePrice'),
+                medianDaysOnMarket=item.get('medianDaysOnMarket'),
+                averagePricePerSqFt=item.get('averagePricePerSqFt'),
+                modified=datetime.datetime.now()
+            ).where(RealtorListingJulien.originUrl == item['originUrl'])
+            q.execute()
         return item

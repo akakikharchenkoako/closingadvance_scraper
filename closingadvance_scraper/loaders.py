@@ -45,6 +45,17 @@ class RealtorListingAllLoader(ItemLoader):
     agent_in = Identity()
 
 
+class RealtorListingJulienLoader(ItemLoader):
+    default_input_processor = MapCompose(remove_tags, str.strip)
+    default_output_processor = TakeFirst()
+    agentMobile_in = MapCompose(serialize_number)
+    purchasePrice_in = MapCompose(serialize_number)
+    photoCount_in = MapCompose(serialize_number)
+    sqft_in = MapCompose(serialize_number)
+    lotSize_in = MapCompose(serialize_number)
+    agent_in = Identity()
+
+
 class AgentLoader(ItemLoader):
     default_input_processor = MapCompose(remove_tags, str.strip)
     default_output_processor = TakeFirst()

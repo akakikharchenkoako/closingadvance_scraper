@@ -346,3 +346,39 @@ class RealtorListinBroker(Listing):
     class Meta:
         db_table = 'realtor_listing_broker'
         database = db
+
+
+class RealtorListingJulien(Model):
+    agent = ForeignKeyField(RealtorAgent)
+    originUrl = CharField(null=True)
+    agentName = CharField(null=True)
+    agentMobile = CharField(null=True)
+    status = CharField(null=True)
+    soldDate = DateField(null=True)
+    worked = CharField(null=True)
+    beds = IntegerField(null=True)
+    baths = IntegerField(null=True)
+    sqft = IntegerField(null=True)
+    lotSize = IntegerField(null=True)
+    photoCount = IntegerField(null=True)
+    purchasePrice = FloatField(null=True)
+    propertyAddress = CharField(null=True)
+    zipCode = CharField(null=True)
+    moreExpensiveThanNearbyProperties = FloatField(null=True)
+    lessExpensiveThanNearbyProperties = FloatField(null=True)
+    daysOnMarket = IntegerField(null=True)
+    soldHigherThanTheListedPrice = FloatField(null=True)
+    soldLowerThanTheListedPrice = FloatField(null=True)
+    pricePerSqFt = FloatField(null=True)
+    propertyType = CharField(null=True)
+    yearBuilt = IntegerField(null=True)
+    medianListingPrice = FloatField(null=True)
+    medianSalePrice = FloatField(null=True)
+    medianDaysOnMarket = IntegerField(null=True)
+    averagePricePerSqFt = FloatField(null=True)
+    created = DateTimeField(default=datetime.datetime.now)
+    modified = DateTimeField(null=True)
+
+    class Meta:
+        db_table = 'realtor_listings_julien'
+        database = db
