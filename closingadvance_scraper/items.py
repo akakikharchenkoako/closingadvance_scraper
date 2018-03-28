@@ -85,6 +85,7 @@ class RealtorListingForJulienItem(scrapy.Item):
     lotSize = scrapy.Field()
     photoCount = scrapy.Field()
     purchasePrice = scrapy.Field()
+    currentPrice = scrapy.Field()
     propertyAddress = scrapy.Field()
     zipCode = scrapy.Field()
     moreExpensiveThanNearbyProperties = scrapy.Field()

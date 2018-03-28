@@ -49,8 +49,8 @@ class RealtorListingAllSpider(scrapy.Spider):
                 purchasePrice = listing_thumbnail.xpath('.//div[@class="listing-info"]//li[@class="listing-info-price"]/text()').extract_first()
                 if purchasePrice:
                     purchasePrice = re.sub("[^\d\.]", "", purchasePrice)
-                    if purchasePrice.isdigit():
-                        purchasePrice = purchasePrice
+                    if not purchasePrice.isdigit():
+                        purchasePrice = None
                 meta_payload = {'agent_id': response.meta['agent_id'],
                                 'status': status,
                                 'soldDate': soldDate,
