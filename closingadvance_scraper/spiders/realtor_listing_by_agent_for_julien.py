@@ -40,8 +40,7 @@ class RealtorListingAllSpider(scrapy.Spider):
             if listing_thumbnail.xpath('.//div[@class="listing-photo-label"]'
                                        '/span[@data-label="property-label-new"]'
                                        '/text()').extract_first().lower() == 'sold' and \
-                listing_thumbnail.xpath('.//div[@class="listing-photo-label"]'
-                                        '/span/text()').extract()[2].lower() == 'worked with seller':
+                    'worked with seller' in listing_thumbnail.xpath('.//div[@class="listing-photo-label"]/span/text()').extract()[2].lower():
                 link = "https:" + listing_thumbnail.xpath('./@data-prop-url-path').extract_first()
                 status = 'sold'
                 soldDate = listing_thumbnail.xpath('.//div[@class="listing-photo-label"]/span/text()').extract()[1]
@@ -58,7 +57,7 @@ class RealtorListingAllSpider(scrapy.Spider):
 
         property_type = response.xpath('//li[@class="ldp-key-fact-item"]/div[text()="Type"]/following-sibling::div/text()').extract_first()
 
-        if 'single family' not in property_type.lower() and False and False and False:
+        if 'single family' not in property_type.lower():
             self.logger.info('Not Single Family %s' % response.url)
             return
 
