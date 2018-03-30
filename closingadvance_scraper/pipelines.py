@@ -25,11 +25,6 @@ class MySQLPipeline(object):
 
     def __init__(self, stats):
         db.connect()
-        db.create_tables([
-            TruliaListing, RealtorListing, ZillowListing,
-            PriceHistory, ZillowAgent, ZillowBroker,
-            Century21Agent, Century21Office, Company,
-            Attorney, BankInfo, Lender], safe=True)
 
     def open_spider(self, spider):
         pass
