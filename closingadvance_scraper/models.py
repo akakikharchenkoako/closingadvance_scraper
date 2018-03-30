@@ -383,3 +383,34 @@ class RealtorListingJulien(Model):
     class Meta:
         db_table = 'realtor_listings_julien'
         database = db
+
+
+class RealtorPriceHistoryForJulien(Model):
+    listing = ForeignKeyField(RealtorListingJulien)
+    listingDate = DateField(null=True)
+    listingEvent = CharField(null=True)
+    purchasePrice = IntegerField(null=True)
+    listingSource = CharField(null=True)
+
+    class Meta:
+        db_table = 'realtor_price_histories_julien'
+        database = db
+
+
+class RealtorTaxHistoryForJulien(Model):
+    listing = ForeignKeyField(RealtorListingJulien)
+    listingDate = CharField(null=True)
+    taxPrice = IntegerField(null=True)
+
+    class Meta:
+        db_table = 'realtor_tax_histories_julien'
+        database = db
+
+
+class RealtorNearbyHistoryForJulien(Model):
+    listing = ForeignKeyField(RealtorListingJulien)
+    nearbyPrice = IntegerField(null=True)
+
+    class Meta:
+        db_table = 'realtor_nearby_histories_julien'
+        database = db

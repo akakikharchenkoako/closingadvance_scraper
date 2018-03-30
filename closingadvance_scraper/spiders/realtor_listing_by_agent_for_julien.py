@@ -21,7 +21,7 @@ logger.addHandler(logging.StreamHandler())
 from closingadvance_scraper.models import *
 
 
-class RealtorListingAllSpider(scrapy.Spider):
+class RealtorListingSpiderForJulien(scrapy.Spider):
     name = 'realtor_listing_by_agent_for_julien'
     allowed_domains = ['www.realtor.com']
     listingStatus = ['Active', 'Contingent', 'For Sale', 'New', 'Pending', 'Sold', 'Under Contract']

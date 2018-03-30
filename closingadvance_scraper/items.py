@@ -102,6 +102,13 @@ class RealtorListingForJulienItem(scrapy.Item):
     averagePricePerSqFt = scrapy.Field()
 
 
+class RealtorListingExtraJulienItem(ListingItem):
+    listing_id = scrapy.Field()
+    priceHistories = scrapy.Field()
+    taxHistories = scrapy.Field()
+    nearbyPriceHistories = scrapy.Field()
+
+
 class AgentItem(scrapy.Item):
     originUrl = scrapy.Field()
     brokerUrl = scrapy.Field()

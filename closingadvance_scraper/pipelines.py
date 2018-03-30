@@ -70,6 +70,8 @@ class MySQLPipeline(object):
             return self.process_realtor_listing_all_item(item, spider)
         elif isinstance(item, RealtorListingForJulienItem):
             return self.process_realtor_listing_julien_item(item, spider)
+        elif isinstance(item, RealtorListingExtraJulienItem):
+            return self.process_realtor_listing_extra_julien_item(item, spider)
         else:
             return item
 
@@ -837,3 +839,33 @@ class MySQLPipeline(object):
             ).where(RealtorListingJulien.originUrl == item['originUrl'])
             q.execute()
         return item
+
+    def process_realtor_listing_extra_julien_item(self, item, spider):
+        listing = RealtorListingJulien.get(RealtorListingJulien.id == item['listing_id'])
+
+        if item.get('priceHistories'):
+            for idx, entry in enumerate(ast.literal_eval(item.get('priceHistories'))):
+                RealtorPriceHistoryForJulien.create(
+                    listing=listing,
+                    listingDate=entry.get('listingDate'),
+                    purchasePrice=entry.get('purchasePrice'),
+                    listingEvent=entry.get('listingEvent'),
+                    listingSource=entry.get('listingSource'),
+                )
+
+        if item.get('taxHistories'):
+            for idx, entry in enumerate(ast.literal_eval(item.get('taxHistories'))):
+                RealtorTaxHistoryForJulien.create(
+                    listing=listing,
+                    listingDate=entry.get('listingDate'),
+                    taxPrice=entry.get('taxPrice'),
+                )
+
+        if item.get('nearbyPriceHistories'):
+            for idx, entry in enumerate(ast.literal_eval(item.get('nearbyPriceHistories'))):
+                RealtorNearbyHistoryForJulien.create(
+                    listing=listing,
+                    nearbyPrice=entry.get('estimatePrice'),
+                )
+
+        return None
