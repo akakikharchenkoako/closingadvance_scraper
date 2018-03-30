@@ -386,7 +386,7 @@ class RealtorListingJulien(Model):
 
 
 class RealtorPriceHistoryForJulien(Model):
-    listing = ForeignKeyField(RealtorListingJulien)
+    listing = ForeignKeyField(RealtorListingJulien, null=True)
     listingDate = DateField(null=True)
     listingEvent = CharField(null=True)
     purchasePrice = IntegerField(null=True)
@@ -398,7 +398,7 @@ class RealtorPriceHistoryForJulien(Model):
 
 
 class RealtorTaxHistoryForJulien(Model):
-    listing = ForeignKeyField(RealtorListingJulien)
+    listing = ForeignKeyField(RealtorListingJulien, null=True)
     listingDate = CharField(null=True)
     taxPrice = IntegerField(null=True)
 
@@ -408,7 +408,7 @@ class RealtorTaxHistoryForJulien(Model):
 
 
 class RealtorNearbyHistoryForJulien(Model):
-    listing = ForeignKeyField(RealtorListingJulien)
+    listing = ForeignKeyField(RealtorListingJulien, null=True)
     nearbyPrice = IntegerField(null=True)
 
     class Meta:
