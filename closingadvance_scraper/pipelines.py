@@ -856,4 +856,12 @@ class MySQLPipeline(object):
                 modified=datetime.datetime.now()
             ).where(RealtorListingJulien.originUrl == item['originUrl'])
             q.execute()
+
+        for broker_id in item.get('brokers_list').split(' '):
+            broker = RealtorBroker.get(RealtorBroker.id == broker_id)
+            RealtorListinBroker.create(
+                listing=listing,
+                broker=broker,
+            )
+
         return item

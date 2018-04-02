@@ -27,7 +27,7 @@ class RealtorListingForJulienSpider(scrapy.Spider):
         input_file = csv.DictReader(open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/input/realtor_agents.csv"), delimiter=";")
 
         for row in input_file:
-            yield scrapy.Request(row["originUrl"], callback=self.parse, meta={'agent_id': row["id"]})
+            yield scrapy.Request(row["originUrl"], callback=self.parse, meta={'agent_id': row["id"], 'brokers_list': row["brokers_list"]})
 
     def parse(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
@@ -47,12 +47,31 @@ class RealtorListingForJulienSpider(scrapy.Spider):
                     purchasePrice = re.sub("[^\d\.]", "", purchasePrice)
                     if not purchasePrice.isdigit():
                         purchasePrice = None
+
                 meta_payload = {'agent_id': response.meta['agent_id'],
                                 'status': status,
                                 'soldDate': soldDate,
                                 'worked': worked,
-                                'purchasePrice': purchasePrice}
+                                'purchasePrice': purchasePrice,
+                                'brokers_list': response.meta['brokers_list']}
                 yield response.follow(link, self.parse_listing, meta=meta_payload)
+
+        for listing_thumbnail in response.xpath('//div[@id="section_for_sale_all_wrap"]/div'):
+            link = "https:" + listing_thumbnail.xpath('./@data-prop-url-path').extract_first()
+            status = listing_thumbnail.xpath('.//div[@class="listing-photo-label"]/span[@data-label="property-label-new"]/text()').extract_first()
+            soldDate = listing_thumbnail.xpath('.//div[@class="listing-photo-label"]/span/text()').extract()[1]
+            soldDate = datetime.datetime.strptime(soldDate, '%A, %B %d, %Y').strftime("%Y-%m-%d")
+            purchasePrice = listing_thumbnail.xpath('.//div[@class="listing-info"]//li[@class="listing-info-price"]/text()').extract_first()
+            if purchasePrice:
+                purchasePrice = re.sub("[^\d\.]", "", purchasePrice)
+                if not purchasePrice.isdigit():
+                    purchasePrice = None
+            meta_payload = {'agent_id': response.meta['agent_id'],
+                            'status': status,
+                            'soldDate': soldDate,
+                            'purchasePrice': purchasePrice,
+                            'brokers_list': response.meta['brokers_list']}
+            yield response.follow(link, self.parse_listing, meta=meta_payload)
 
     def parse_listing(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
@@ -79,11 +98,13 @@ class RealtorListingForJulienSpider(scrapy.Spider):
         l = RealtorListingJulienLoader(item=RealtorListingForJulienItem(), response=response)
         l.add_value('originUrl', response.url)
         l.add_value('agent_id', response.meta['agent_id'])
+        l.add_value('brokers_list', response.meta['brokers_list'])
         l.add_xpath('agentName', '//span[contains(@data-label, "agent-name")]/text()')
         l.add_xpath('agentMobile', '//span[contains(@data-label, "agent-phone")]/text()')
         l.add_value('status', response.meta['status'])
         l.add_value('soldDate', response.meta['soldDate'])
-        l.add_value('worked', response.meta['worked'])
+        if response.meta.get('worked'):
+            l.add_value('worked', response.meta['worked'])
         beds = response.xpath('//div[@id="ldp-property-meta"]//li[@data-label="property-meta-beds"]/span/text()').extract_first()
         isBedsIsInRange = False
         if beds and beds.strip() and beds.strip().isdigit():
