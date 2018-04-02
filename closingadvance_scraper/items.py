@@ -100,6 +100,7 @@ class RealtorListingForJulienItem(scrapy.Item):
     medianSalePrice = scrapy.Field()
     medianDaysOnMarket = scrapy.Field()
     averagePricePerSqFt = scrapy.Field()
+    brokers_list = scrapy.Field()
     priceHistories = scrapy.Field()
     taxHistories = scrapy.Field()
     nearbyPriceHistories = scrapy.Field()
