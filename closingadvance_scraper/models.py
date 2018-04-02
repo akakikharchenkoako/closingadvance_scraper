@@ -381,7 +381,7 @@ class RealtorListingJulien(Model):
     modified = DateTimeField(null=True)
 
     class Meta:
-        db_table = 'realtor_listings_julien'
+        db_table = 'realtor_listings'
         database = db
 
 
@@ -393,7 +393,7 @@ class RealtorPriceHistoryForJulien(Model):
     listingSource = CharField(null=True)
 
     class Meta:
-        db_table = 'realtor_price_histories_julien'
+        db_table = 'realtor_price_histories'
         database = db
 
 
@@ -403,7 +403,7 @@ class RealtorTaxHistoryForJulien(Model):
     taxPrice = IntegerField(null=True)
 
     class Meta:
-        db_table = 'realtor_tax_histories_julien'
+        db_table = 'realtor_tax_histories'
         database = db
 
 
@@ -412,5 +412,5 @@ class RealtorNearbyHistoryForJulien(Model):
     nearbyPrice = IntegerField(null=True)
 
     class Meta:
-        db_table = 'realtor_nearby_histories_julien'
+        db_table = 'realtor_nearby_histories'
         database = db
