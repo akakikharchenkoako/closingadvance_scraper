@@ -46,6 +46,6 @@ class RealtorListingFix1ForJulienSpider(scrapy.Spider):
                 l = RealtorListingFix1JulienLoader(item=RealtorListingFix1ForJulienItem(), response=response)
                 l.add_value('beds', beds)
                 l.add_value('baths', baths)
-                l.add_value('originUrl', response.url)
+                l.add_value('originUrl', response.meta['listingUrl'])
 
                 yield l.load_item()
