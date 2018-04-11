@@ -105,6 +105,12 @@ class RealtorListingForJulienItem(scrapy.Item):
     nearbyPriceHistories = scrapy.Field()
 
 
+class RealtorListingFix1ForJulienItem(scrapy.Item):
+    originUrl = scrapy.Field()
+    beds = scrapy.Field()
+    baths = scrapy.Field()
+
+
 class AgentItem(scrapy.Item):
     originUrl = scrapy.Field()
     brokerUrl = scrapy.Field()

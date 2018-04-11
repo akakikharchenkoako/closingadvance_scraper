@@ -65,6 +65,8 @@ class MySQLPipeline(object):
             return self.process_realtor_listing_all_item(item, spider)
         elif isinstance(item, RealtorListingForJulienItem):
             return self.process_realtor_listing_for_julien_item(item, spider)
+        elif isinstance(item, RealtorListingFix1ForJulienItem):
+            return self.process_realtor_listing_fix1_for_julien_item(item, spider)
         else:
             return item
 
@@ -856,4 +858,13 @@ class MySQLPipeline(object):
                 modified=datetime.datetime.now()
             ).where(RealtorListingJulien.originUrl == item['originUrl'])
             q.execute()
+        return item
+
+    def process_realtor_listing_fix1_for_julien_item(self, item, spider):
+        q = RealtorListingJulien.update(
+            beds=item.get('beds'),
+            baths=item.get('baths'),
+        ).where(RealtorListingJulien.originUrl == item['originUrl'])
+        q.execute()
+
         return item

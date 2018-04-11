@@ -57,6 +57,11 @@ class RealtorListingJulienLoader(ItemLoader):
     agent_in = Identity()
 
 
+class RealtorListingFix1JulienLoader(ItemLoader):
+    default_input_processor = MapCompose(remove_tags, str.strip)
+    default_output_processor = TakeFirst()
+
+
 class RealtorListingExtraJulienLoader(ItemLoader):
     default_input_processor = MapCompose(remove_tags, str.strip)
     default_output_processor = TakeFirst()
