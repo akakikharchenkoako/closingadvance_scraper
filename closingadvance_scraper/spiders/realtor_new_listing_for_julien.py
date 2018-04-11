@@ -34,21 +34,18 @@ class RealtorNewListingForJulienSpider(scrapy.Spider):
     def parse(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
 
-        for listing_thumbnail in response.xpath('//div[@id="section_recently_sold_all_wrap"]/div'):
+        for listing_thumbnail in response.xpath('//div[@id="section_for_sale_all_wrap"]/div'):
             if listing_thumbnail.xpath('.//div[@class="listing-photo-label"]'
                                        '/span[@data-label="property-label-new"]'
-                                       '/text()').extract_first().lower() == 'sold' and \
-                    'worked with seller' in listing_thumbnail.xpath('.//div[@class="listing-photo-label"]/span/text()').extract()[2].lower():
-
+                                       '/text()').extract_first().lower() == 'for sale':
                 stateAbbr = listing_thumbnail.xpath('.//li[@class="listing-info-address ellipsis"]/text()').extract_first()
                 stateAbbr = stateAbbr.split(',')[1].strip()
                 if stateAbbr not in self.statesAbbrList:
                     continue
                 link = "https:" + listing_thumbnail.xpath('./@data-prop-url-path').extract_first()
-                status = 'sold'
+                status = 'for sale'
                 soldDate = listing_thumbnail.xpath('.//div[@class="listing-photo-label"]/span/text()').extract()[1]
                 soldDate = datetime.datetime.strptime(soldDate, '%A, %B %d, %Y').strftime("%Y-%m-%d")
-                worked = listing_thumbnail.xpath('.//div[@class="listing-photo-label"]/span/text()').extract()[2]
                 purchasePrice = listing_thumbnail.xpath('.//div[@class="listing-info"]//li[@class="listing-info-price"]/text()').extract_first()
                 if purchasePrice:
                     purchasePrice = re.sub("[^\d\.]", "", purchasePrice)
@@ -68,7 +65,6 @@ class RealtorNewListingForJulienSpider(scrapy.Spider):
                 meta_payload = {'agent_id': response.meta['agent_id'],
                                 'status': status,
                                 'soldDate': soldDate,
-                                'worked': worked,
                                 'beds': beds,
                                 'baths': baths,
                                 'purchasePrice': purchasePrice}
@@ -88,6 +84,7 @@ class RealtorNewListingForJulienSpider(scrapy.Spider):
         isListingStatusFound = False
 
         if listing_status:
+            listing_status = listing_status.strip()
             for status in self.listingStatus:
                 if status.lower().strip() in listing_status.lower():
                     isListingStatusFound = True
@@ -96,14 +93,17 @@ class RealtorNewListingForJulienSpider(scrapy.Spider):
         if not isListingStatusFound and False and False and False:
             self.logger.info('Not For Sale or Pending %s' % response.url)
             return
+        if listing_status.lower() == 'active':
+            newStatus = response.xpath('//section[@id="ldp-hero-container"]//span[@id="label-new"]/text()').extract_first()
+            if newStatus and newStatus.strip().lower() == 'new':
+                listing_status = "{0}-{1}".format(listing_status, 'New')
         l = RealtorListingJulienLoader(item=RealtorListingForJulienItem(), response=response)
         l.add_value('originUrl', response.url)
         l.add_value('agent_id', response.meta['agent_id'])
         l.add_xpath('agentName', '//span[contains(@data-label, "agent-name")]/text()')
         l.add_xpath('agentMobile', '//span[contains(@data-label, "agent-phone")]/text()')
-        l.add_value('status', response.meta['status'])
+        l.add_value('status', listing_status.lower())
         l.add_value('soldDate', response.meta['soldDate'])
-        l.add_value('worked', response.meta['worked'])
         if response.meta.get('beds'):
             beds = response.meta['beds']
         else:
