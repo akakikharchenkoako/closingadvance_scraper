@@ -41,7 +41,7 @@ class RealtorNewListingForJulienSpider(scrapy.Spider):
                 stateAbbr = listing_thumbnail.xpath('.//li[@class="listing-info-address ellipsis"]/text()').extract_first()
                 self.logger.info('Location %s' % (stateAbbr))
                 stateAbbr = stateAbbr.split(',')[1].strip()
-                if stateAbbr.upper() not in ['TX']:  # self.statesAbbrList:
+                if stateAbbr.upper() not in self.statesAbbrList:
                     continue
                 link = "https:" + listing_thumbnail.xpath('./@data-prop-url-path').extract_first()
                 status = 'for sale'
