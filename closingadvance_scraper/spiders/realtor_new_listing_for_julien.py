@@ -39,8 +39,9 @@ class RealtorNewListingForJulienSpider(scrapy.Spider):
                                        '/span[@data-label="property-label-new"]'
                                        '/text()').extract_first().lower() == 'for sale':
                 stateAbbr = listing_thumbnail.xpath('.//li[@class="listing-info-address ellipsis"]/text()').extract_first()
+                self.logger.info('Location %s' % (stateAbbr))
                 stateAbbr = stateAbbr.split(',')[1].strip()
-                if stateAbbr not in self.statesAbbrList:
+                if stateAbbr.upper() not in ['TX']:  # self.statesAbbrList:
                     continue
                 link = "https:" + listing_thumbnail.xpath('./@data-prop-url-path').extract_first()
                 status = 'for sale'
@@ -90,19 +91,15 @@ class RealtorNewListingForJulienSpider(scrapy.Spider):
                     isListingStatusFound = True
                     listing_status = status
                     break
-        if not isListingStatusFound and False and False and False:
+        if not isListingStatusFound:
             self.logger.info('Not For Sale or Pending %s' % response.url)
             return
-        if listing_status.lower() == 'active':
-            newStatus = response.xpath('//section[@id="ldp-hero-container"]//span[@id="label-new"]/text()').extract_first()
-            if newStatus and newStatus.strip().lower() == 'new':
-                listing_status = "{0}-{1}".format(listing_status, 'New')
         l = RealtorListingJulienLoader(item=RealtorListingForJulienItem(), response=response)
         l.add_value('originUrl', response.url)
         l.add_value('agent_id', response.meta['agent_id'])
         l.add_xpath('agentName', '//span[contains(@data-label, "agent-name")]/text()')
         l.add_xpath('agentMobile', '//span[contains(@data-label, "agent-phone")]/text()')
-        l.add_value('status', listing_status.lower())
+        l.add_value('status', response.meta['status'])
         l.add_value('soldDate', response.meta['soldDate'])
         if response.meta.get('beds'):
             beds = response.meta['beds']
@@ -114,7 +111,7 @@ class RealtorNewListingForJulienSpider(scrapy.Spider):
             l.add_value('beds', str(beds))
             if beds >= 3:
                 isBedsIsInRange = True
-        if not isBedsIsInRange and False and False and False:
+        if not isBedsIsInRange:
             return
         if response.meta.get('baths'):
             baths = response.meta['baths']
@@ -132,7 +129,7 @@ class RealtorNewListingForJulienSpider(scrapy.Spider):
                 l.add_value('sqft', str(sqft))
                 if sqft >= 1250:
                     isSqftIsInRange = True
-        if not isSqftIsInRange and False and False and False:
+        if not isSqftIsInRange:
             return
         lotSize = response.xpath('//li[@data-label="property-meta-lotsize"]')
         isSqftLot = 'sqft lot' in ' ' . join(lotSize.xpath('./text()').extract())
@@ -151,7 +148,7 @@ class RealtorNewListingForJulienSpider(scrapy.Spider):
                     l.add_value('lotSize', str(int(43560 * float(lotSize))))
                     if float(lotSize) <= 2.0 and float(lotSize) >= 0:
                         isLotSizeIsInRange = True
-        if not isLotSizeIsInRange and False and False and False:
+        if not isLotSizeIsInRange:
             return
         l.add_xpath('photoCount', '//a[@id="hero-view-photo"]/span[3]/text()', re=r'([0-9\,]+)')
         purchasePrice = response.meta['purchasePrice']
@@ -159,7 +156,7 @@ class RealtorNewListingForJulienSpider(scrapy.Spider):
         l.add_value('purchasePrice', purchasePrice)
         if int(purchasePrice) > 150000 and int(purchasePrice) < 550000:
             isPurchasePriceIsInRange = True
-        if not isPurchasePriceIsInRange and False and False and False:
+        if not isPurchasePriceIsInRange:
             return
         currentPrice = response.xpath('//div[@class="ldp-header-price"]//span[@itemprop="price"]/text()').extract_first()
         if currentPrice:
@@ -206,7 +203,7 @@ class RealtorNewListingForJulienSpider(scrapy.Spider):
             l.add_value('yearBuilt', str(yearBuilt))
             if yearBuilt >= 1980 and yearBuilt <= 2016:
                 isYearBuiltIsInRange = True
-        if not isYearBuiltIsInRange and False and False and False:
+        if not isYearBuiltIsInRange:
             return
         medianListingPrice = response.xpath('//div[text()="Median Listing Price"]/preceding-sibling::p/text()').extract_first()
         if medianListingPrice:
