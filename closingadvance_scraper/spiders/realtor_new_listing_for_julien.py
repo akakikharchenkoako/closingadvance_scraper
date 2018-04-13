@@ -43,7 +43,7 @@ class RealtorNewListingForJulienSpider(scrapy.Spider):
                 stateAbbr = stateAbbr.split(',')[1].strip()
                 if stateAbbr.upper() not in self.statesAbbrList:
                     continue
-                link = "https:" + listing_thumbnail.xpath('./@data-prop-url-path').extract_first()
+                link = listing_thumbnail.xpath('.//@href').extract_first()
                 status = 'for sale'
                 soldDate = listing_thumbnail.xpath('.//div[@class="listing-photo-label"]/span/text()').extract()[1]
                 soldDate = datetime.datetime.strptime(soldDate, '%A, %B %d, %Y').strftime("%Y-%m-%d")
