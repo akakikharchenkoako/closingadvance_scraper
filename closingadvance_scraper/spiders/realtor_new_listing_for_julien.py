@@ -52,17 +52,16 @@ class RealtorNewListingForJulienSpider(scrapy.Spider):
                     purchasePrice = re.sub("[^\d\.]", "", purchasePrice)
                     if not purchasePrice.isdigit():
                         purchasePrice = None
-
                 listingMetaInfo = listing_thumbnail.xpath('.//li[@data-label="property-meta-beds-baths"]'
                                                           '//span[@class="data-value"]/text()').extract_first()
-
+                beds = None
+                baths = None
                 if listingMetaInfo:
                     bedsAndBaths = re.findall('(\d)bd (\d)ba', listingMetaInfo)
                     if bedsAndBaths:
                         bedsAndBaths = bedsAndBaths[0]
                         beds = bedsAndBaths[0]
                         baths = bedsAndBaths[1]
-
                 meta_payload = {'agent_id': response.meta['agent_id'],
                                 'status': status,
                                 'soldDate': soldDate,
