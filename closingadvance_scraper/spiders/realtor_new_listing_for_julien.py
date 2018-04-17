@@ -29,7 +29,7 @@ class RealtorNewListingForJulienSpider(scrapy.Spider):
         input_file = csv.DictReader(open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/input/realtor_agents.csv"), delimiter=";")
 
         for row in input_file:
-            yield scrapy.Request(row["originUrl"], callback=self.parse, meta={'agent_id': row["id"]})
+            yield scrapy.Request(row["originUrl"], callback=self.parse, meta={'agent_id': row["id"]}, headers={'X-Crawlera-Profile': 'desktop'})
 
     def parse(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
@@ -68,7 +68,7 @@ class RealtorNewListingForJulienSpider(scrapy.Spider):
                                 'beds': beds,
                                 'baths': baths,
                                 'purchasePrice': purchasePrice}
-                yield response.follow(link, self.parse_listing, meta=meta_payload)
+                yield response.follow(link, self.parse_listing, meta=meta_payload, headers={'X-Crawlera-Profile': 'desktop'})
 
     def parse_listing(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
