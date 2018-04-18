@@ -27,7 +27,7 @@ class RealtorListingFix1ForJulienSpider(scrapy.Spider):
         input_file = csv.DictReader(open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/input/ID_list_bd_or_ba_is_null.csv"), delimiter=";")
 
         for row in input_file:
-            yield scrapy.Request(row["agentUrl"], callback=self.parse, meta={'listingUrl': row["listingUrl"]})
+            yield scrapy.Request(row["agentUrl"], callback=self.parse, meta={'listingUrl': row["listingUrl"]}, headers={'X-Crawlera-Profile': 'desktop'})
 
     def parse(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
