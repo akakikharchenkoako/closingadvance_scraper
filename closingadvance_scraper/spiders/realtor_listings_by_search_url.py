@@ -2,20 +2,12 @@
 
 import logging
 import scrapy
-import csv
 import os
 import json
-import re
-from closingadvance_scraper.locations import states
-from closingadvance_scraper.items import RealtorListingForJulienItem
-from closingadvance_scraper.loaders import RealtorListingJulienLoader
-from closingadvance_scraper.processors import to_datetime
-
 
 logger = logging.getLogger('peewee')
 logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler())
-from closingadvance_scraper.models import *
 
 
 class RealtorListingsBySearchUrl(scrapy.Spider):
