@@ -87,45 +87,64 @@ class RealtorListingsBySearchUrl(scrapy.Spider):
     def parse(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
 
-        sub_urls = response.xpath('//ul[contains(@class, "srp-list-marginless list-unstyled")]/li/@data-url').extract()
-        property_urls = ["https://www.realtor.com" + url for url in sub_urls]
+        if response.status == 200:
+            sub_urls = response.xpath('//ul[contains(@class, "srp-list-marginless list-unstyled")]/li/@data-url').extract()
+            property_urls = ["https://www.realtor.com" + url for url in sub_urls]
 
-        with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/realtor_listing_urls.csv", "a") as output_file:
-            for url in property_urls:
-                output_file.write(url + "\n")
+            with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/realtor_listing_urls.csv", "a") as output_file:
+                for url in property_urls:
+                    output_file.write(url + "\n")
 
-        output_file.close()
+            output_file.close()
 
-        page_number = response.xpath('//span[@class="page current"]/text()').extract_first()
-        page_number = page_number.strip() if page_number else None
+            page_number = response.xpath('//span[@class="page current"]/text()').extract_first()
+            page_number = page_number.strip() if page_number else None
 
-        print(page_number)
-        print(len(property_urls))
-        print(response.meta["post_params"]["search_criteria"])
+            print(page_number)
+            print(len(property_urls))
+            print(response.meta["post_params"]["search_criteria"])
 
-        if "retry" in response.meta:
-            print("-----retry " + str(response.meta["retry"]))
-
-        if page_number and int(page_number) != response.meta["post_params"]["page"]:
             if "retry" in response.meta:
+                print("-----retry " + str(response.meta["retry"]))
+
+            if page_number and int(page_number) != response.meta["post_params"]["page"]:
+                if "retry" in response.meta:
+                    if response.meta["retry"] > 0:
+                        response.meta["retry"] = response.meta["retry"] - 1
+                    else:
+                        return
+                else:
+                    response.meta["retry"] = 5
+            else:
+                if "retry" in response.meta:
+                    response.meta.pop('retry', None)
+
+            if "retry" not in response.meta:
+                response.meta["post_params"]["search_criteria"] = self.search_criteria + "/pg-" + str(response.meta["post_params"]["page"])
+                response.meta["post_params"]["page"] = response.meta["post_params"]["page"] + 1
+
+            yield scrapy.Request(self.pagination_url,
+                                 method="POST",
+                                 body=json.dumps(response.meta["post_params"]),
+                                 callback=self.parse,
+                                 headers={'Content-Type': 'application/json', 'X-Crawlera-Profile': 'desktop'},
+                                 dont_filter=True,
+                                 meta=response.meta)
+        else:
+            if "retry" in response.meta:
+                print("-----retry " + str(response.meta["retry"]))
+
                 if response.meta["retry"] > 0:
                     response.meta["retry"] = response.meta["retry"] - 1
                 else:
                     return
             else:
                 response.meta["retry"] = 5
-        else:
-            if "retry" in response.meta:
-                response.meta.pop('retry', None)
 
-        if "retry" not in response.meta:
-            response.meta["post_params"]["search_criteria"] = self.search_criteria + "/pg-" + str(response.meta["post_params"]["page"])
-            response.meta["post_params"]["page"] = response.meta["post_params"]["page"] + 1
-
-        yield scrapy.Request(self.pagination_url,
-                             method="POST",
-                             body=json.dumps(response.meta["post_params"]),
-                             callback=self.parse,
-                             headers={'Content-Type': 'application/json', 'X-Crawlera-Profile': 'desktop'},
-                             dont_filter=True,
-                             meta=response.meta)
+            yield scrapy.Request(self.pagination_url,
+                                 method="POST",
+                                 body=json.dumps(response.meta["post_params"]),
+                                 callback=self.parse,
+                                 headers={'Content-Type': 'application/json', 'X-Crawlera-Profile': 'desktop'},
+                                 dont_filter=True,
+                                 meta=response.meta)
