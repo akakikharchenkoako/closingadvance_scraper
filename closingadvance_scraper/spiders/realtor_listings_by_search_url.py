@@ -140,3 +140,11 @@ class RealtorListingsBySearchUrl(scrapy.Spider):
                     return
             else:
                 response.meta["retry"] = 5
+
+            yield scrapy.Request(self.pagination_url,
+                                 method="POST",
+                                 body=json.dumps(response.meta["post_params"]),
+                                 callback=self.parse,
+                                 headers={'Content-Type': 'application/json', 'X-Crawlera-Profile': 'desktop'},
+                                 dont_filter=True,
+                                 meta=response.meta)
