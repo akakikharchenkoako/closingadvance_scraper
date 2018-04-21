@@ -104,21 +104,22 @@ class RealtorListingsBySearchUrl(scrapy.Spider):
             print(len(property_urls))
             print(response.meta["post_params"]["search_criteria"])
 
-            if "retry" in response.meta:
-                print("-----retry " + str(response.meta["retry"]))
-
-            if page_number and int(page_number) != response.meta["post_params"]["page"]:
-                if "retry" in response.meta:
-                    if response.meta["retry"] > 0:
-                        response.meta["retry"] = response.meta["retry"] - 1
-                    else:
-                        return
-                else:
-                    response.meta["retry"] = 5
-
             if page_number and int(page_number) == response.meta["post_params"]["page"]:
                 if "retry" in response.meta:
                     response.meta.pop('retry', None)
+
+            if "retry" in response.meta:
+                print("-----retry " + str(response.meta["retry"]))
+
+            if "retry" in response.meta and response.meta["retry"] < 0:
+                return
+
+            if "retry" in response.meta:
+                response.meta["retry"] = response.meta["retry"] - 1
+
+            if page_number and int(page_number) != response.meta["post_params"]["page"]:
+                if "retry" not in response.meta:
+                    response.meta["retry"] = 5
 
             if "retry" not in response.meta:
                 response.meta["post_params"]["search_criteria"] = self.search_criteria + "/pg-" + str(response.meta["post_params"]["page"])
