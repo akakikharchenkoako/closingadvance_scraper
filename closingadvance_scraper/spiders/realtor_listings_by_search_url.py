@@ -4,6 +4,7 @@ import logging
 import scrapy
 import os
 import json
+from closingadvance_scraper.locations import states
 
 logger = logging.getLogger('peewee')
 logger.setLevel(logging.INFO)
@@ -13,18 +14,39 @@ logger.addHandler(logging.StreamHandler())
 class RealtorListingsBySearchUrl(scrapy.Spider):
     name = 'realtor_listings_by_search_url_spider'
     allowed_domains = ['www.realtor.com']
+    base_url = "https://www.realtor.com"
+    state_counties_url = "https://www.realtor.com/soldhomeprices/{}/type-single-family-home"
     search_controller = "Search::RecentlySoldController"
-    search_criteria = "New-York_NY/type-single-family-home"
+    search_criteria = "/type-single-family-home"
     pagination_url = 'https://www.realtor.com/pagination_result'
     handle_httpstatus_list = [400, 404, 503, 500]
 
     def start_requests(self):
-        meta_dict = {}
-
         with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/realtor_listing_urls.csv", "w") as output_file:
                 output_file.write("")
 
         output_file.close()
+
+        target_states = [state['abbr'] for state in states]
+
+        for state in target_states:
+            print(state)
+            yield scrapy.Request(self.state_counties_url.format(state),
+                                 callback=self.parse_counties,
+                                 headers={'X-Crawlera-Profile': 'desktop'})
+
+    def parse_counties(self, response):
+        county_urls_list = response.xpath("//div[@class='property-records-content']//div[@class='col-md-6']//div[@class='row'][1]//li/a/@href").extract()
+
+        for url in county_urls_list:
+            print("   " + url)
+            yield scrapy.Request("{0}{1}{2}".format(self.base_url, url, self.search_criteria),
+                                 callback=self.parse_country_properties,
+                                 headers={'X-Crawlera-Profile': 'desktop'},
+                                 meta={"county_name": url.split("/")[2]})
+
+    def parse_country_properties(self, response):
+        meta_dict = {}
 
         if True:
             post_params = {}
@@ -67,7 +89,7 @@ class RealtorListingsBySearchUrl(scrapy.Spider):
             post_params["searchFeaturesToDTM"] = []
             post_params["searchType"] = "city"
             post_params["search_controller"] = self.search_controller
-            post_params["search_criteria"] = self.search_criteria
+            post_params["search_criteria"] = response.meta['county_name'] + self.search_criteria
             post_params["sort"] = None
             post_params["state"] = "NV"
             post_params["street"] = None
@@ -75,6 +97,7 @@ class RealtorListingsBySearchUrl(scrapy.Spider):
             post_params["viewport_height"] = 442
 
         meta_dict["post_params"] = post_params
+        meta_dict["county_name"] = response.meta["county_name"]
 
         yield scrapy.Request(self.pagination_url,
                              method="POST",
@@ -121,8 +144,12 @@ class RealtorListingsBySearchUrl(scrapy.Spider):
                 if "retry" not in response.meta:
                     response.meta["retry"] = 5
 
+            if not page_number:
+                if "retry" not in response.meta:
+                    response.meta["retry"] = 5
+
             if "retry" not in response.meta:
-                response.meta["post_params"]["search_criteria"] = self.search_criteria + "/pg-" + str(response.meta["post_params"]["page"])
+                response.meta["post_params"]["search_criteria"] = response.meta['county_name'] + self.search_criteria + "/pg-" + str(response.meta["post_params"]["page"])
                 response.meta["post_params"]["page"] = response.meta["post_params"]["page"] + 1
 
             yield scrapy.Request(self.pagination_url,
