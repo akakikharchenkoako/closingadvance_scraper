@@ -16,7 +16,7 @@ class RealtorListingsBySearchUrl(scrapy.Spider):
     search_controller = "Search::RecentlySoldController"
     search_criteria = "New-York_NY/type-single-family-home"
     pagination_url = 'https://www.realtor.com/pagination_result'
-    handle_httpstatus_list = [400, 404]
+    handle_httpstatus_list = [400, 404, 503, 500]
 
     def start_requests(self):
         meta_dict = {}
