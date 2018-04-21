@@ -19,7 +19,7 @@ from closingadvance_scraper.models import *
 
 
 class RealtorListingFromQualifiedUrlsSpider(scrapy.Spider):
-    handle_httpstatus_list = [404, 500]
+    handle_httpstatus_list = [400, 404, 503, 500]
     name = 'realtor_listing_from_qualified_urls_spider'
     allowed_domains = ['www.realtor.com']
     listingStatus = ['Active', 'Contingent', 'For Sale', 'New', 'Pending', 'Sold', 'Under Contract']
