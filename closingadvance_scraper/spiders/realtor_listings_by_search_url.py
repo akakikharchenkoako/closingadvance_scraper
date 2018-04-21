@@ -115,7 +115,8 @@ class RealtorListingsBySearchUrl(scrapy.Spider):
                         return
                 else:
                     response.meta["retry"] = 5
-            else:
+
+            if page_number and int(page_number) == response.meta["post_params"]["page"]:
                 if "retry" in response.meta:
                     response.meta.pop('retry', None)
 
