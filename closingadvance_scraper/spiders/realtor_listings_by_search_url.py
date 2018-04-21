@@ -56,7 +56,7 @@ class RealtorListingsBySearchUrl(scrapy.Spider):
                 post_params["facets"]["sqft_max"] = None
                 post_params["facets"]["sqft_min"] = None
             post_params["neighborhood"] = None
-            post_params["page"] = 1
+            post_params["page"] = 385
             post_params["page_size"] = 15
             post_params["pin_height"] = 25
             post_params["pos"] = None
@@ -115,7 +115,8 @@ class RealtorListingsBySearchUrl(scrapy.Spider):
                         return
                 else:
                     response.meta["retry"] = 5
-            else:
+
+            if page_number and int(page_number) == response.meta["post_params"]["page"]:
                 if "retry" in response.meta:
                     response.meta.pop('retry', None)
 
