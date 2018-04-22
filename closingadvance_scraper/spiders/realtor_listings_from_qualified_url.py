@@ -34,7 +34,7 @@ class RealtorListingFromQualifiedUrlsSpider(scrapy.Spider):
 
         output_file.close()
 
-        with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/realtor_listing_urls.csv") as f:
+        with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/qualified_realtor_sold_listings.csv") as f:
             for line in f:
                 yield scrapy.Request(line.strip(),
                                      callback=self.parse_listing,
@@ -138,7 +138,6 @@ class RealtorListingFromQualifiedUrlsSpider(scrapy.Spider):
                 l.add_value('medianDaysOnMarket', medianDaysOnMarket)
                 l.add_value('averagePricePerSqFt', averagePricePerSqFt)
 
-
                 try:
                     price_history_block_list = response.xpath('//div[@id="ldp-history-price"]//table/tbody/tr')
                     price_history_dict_list = []
@@ -206,9 +205,11 @@ class RealtorListingFromQualifiedUrlsSpider(scrapy.Spider):
 
                 yield l.load_item()
             except Exception as e:
-                print(e)
+                with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/failure_list.csv",
+                          "a") as output_file:
+                    output_file.write(response.url + "\n")
         else:
-            with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/404_list.csv",
+            with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/failure_list.csv",
                       "a") as output_file:
                 output_file.write(response.url + "\n")
 
