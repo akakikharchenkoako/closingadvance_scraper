@@ -49,12 +49,10 @@ class RealtorListingJulienLoader(ItemLoader):
     default_input_processor = MapCompose(remove_tags, str.strip)
     default_output_processor = TakeFirst()
     agentMobile_in = MapCompose(serialize_number)
-    purchasePrice_in = MapCompose(serialize_number)
-    currentPrice_in = MapCompose(serialize_number)
+    lastSoldPrice_in = MapCompose(serialize_number)
     photoCount_in = MapCompose(serialize_number)
     sqft_in = MapCompose(serialize_number)
     lotSize_in = MapCompose(serialize_number)
-    agent_in = Identity()
 
 
 class RealtorListingFix1JulienLoader(ItemLoader):
