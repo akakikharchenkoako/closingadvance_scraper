@@ -30,7 +30,7 @@ class RealtorListingFromQualifiedUrlsSpider(scrapy.Spider):
 
         output_file.close()
 
-        with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/realtor_listing_urls.csv") as f:
+        with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/qualified_realtor_sold_listings.csv") as f:
             for line in f:
                 yield scrapy.Request(line.strip(),
                                      callback=self.parse_listing,
