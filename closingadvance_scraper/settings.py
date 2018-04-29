@@ -19,9 +19,9 @@ NEWSPIDER_MODULE = 'closingadvance_scraper.spiders'
 
 DB_HOST = '127.0.0.1'
 DB_USER = 'root'
-DB_PASSWD = 'ceg2ececeg2ece'
+DB_PASSWD = 'password'
 DB_PORT = '3306'
-DB_DB = 'closing_advance'
+DB_DB = 'cag'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
