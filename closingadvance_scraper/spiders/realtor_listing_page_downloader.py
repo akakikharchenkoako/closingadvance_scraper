@@ -2,14 +2,9 @@
 
 import logging
 import scrapy
-import csv
 import os
-import json
 import re
-from closingadvance_scraper.locations import states
-from closingadvance_scraper.items import RealtorListingForJulienItem
-from closingadvance_scraper.loaders import RealtorListingJulienLoader
-from closingadvance_scraper.processors import to_datetime
+from random import shuffle
 
 
 logger = logging.getLogger('peewee')
@@ -29,12 +24,18 @@ class RealtorListingFromQualifiedUrlsSpider(scrapy.Spider):
                 output_file.write("")
 
         output_file.close()
+        listing_urls_list = []
 
         with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/qualified_realtor_sold_listings.csv") as f:
             for line in f:
-                yield scrapy.Request(line.strip(),
-                                     callback=self.parse_listing,
-                                     headers={'X-Crawlera-Profile': 'desktop'})
+                listing_urls_list.append(line.strip())
+
+        listing_urls_list = shuffle(listing_urls_list)
+
+        for listing_url in listing_urls_list:
+            yield scrapy.Request(listing_url,
+                                 callback=self.parse_listing,
+                                 headers={'X-Crawlera-Profile': 'desktop'})
 
     def parse_listing(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
