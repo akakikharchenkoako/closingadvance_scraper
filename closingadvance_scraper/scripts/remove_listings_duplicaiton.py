@@ -4,7 +4,7 @@ import sys
 
 realtor_listing_urls = []
 
-if len(sys.argv) < 2:
+if len(sys.argv) < 3:
     print("Please input csv file names.")
     exit(0)
 

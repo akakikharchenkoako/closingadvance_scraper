@@ -183,26 +183,6 @@ class RealtorListingFromQualifiedUrlsSpider(scrapy.Spider):
                     print(e)
                     pass
 
-                try:
-                    nearby_history_block_list = response.xpath(
-                        '//div[@id="ldp-nearby-home-values"]//ul[contains(@class, "nearby-homevalues-properties")]/li')
-                    nearby_history_dict_list = []
-                    for nearby_record in nearby_history_block_list:
-                        estimatePrice = nearby_record.xpath('./div[1]/text()').extract_first()
-                        if estimatePrice:
-                            estimatePrice = re.sub("[^\d\.]", "", estimatePrice)
-                        nearby_history_dict = {'estimatePrice': estimatePrice}
-                        if not estimatePrice.isdigit():
-                            del nearby_history_dict['estimatePrice']
-                        else:
-                            nearby_history_dict_list.append(nearby_history_dict)
-                    if nearby_history_dict_list:
-                        # l.add_value('priceHistories', json.dumps(price_history_dict_list))
-                        l.add_value('nearbyPriceHistories', str(nearby_history_dict_list))
-                except Exception as e:
-                    print(e)
-                    pass
-
                 yield l.load_item()
             except Exception as e:
                 with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/failure_list.csv",
