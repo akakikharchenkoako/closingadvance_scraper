@@ -30,7 +30,7 @@ class RealtorListingFromQualifiedUrlsSpider(scrapy.Spider):
             for line in f:
                 listing_urls_list.append(line.strip())
 
-        listing_urls_list = shuffle(listing_urls_list)
+        shuffle(listing_urls_list)
 
         for listing_url in listing_urls_list:
             yield scrapy.Request(listing_url,
