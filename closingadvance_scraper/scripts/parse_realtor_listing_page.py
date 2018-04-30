@@ -109,11 +109,11 @@ for listing_page in os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/.
                       "rating, " \
                       "schoolName) " \
                       "VALUES " \
-                      "({0},{1},'{2}')" \
-                    .format(listing_id,
-                            rating if rating else 'NULL',
-                            school_name if school_name else '')
-                cursor.execute(sql)
+                      "(%s,%s,%s)"
+                cursor.execute(sql,
+                               (listing_id,
+                                rating if rating else None,
+                                school_name if school_name else None))
                 averageNearbySchoolRating += int(rating)
                 nearby_schools_dict_list.append(nearby_school_dict)
             if nearby_schools_dict_list:
