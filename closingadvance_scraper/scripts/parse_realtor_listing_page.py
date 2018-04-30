@@ -255,6 +255,7 @@ for listing_page in os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/.
             # Commit your changes in the database
             db.commit()
         except Exception as e:
+            print(e)
             # Rollback in case there is any error
             db.rollback()
 
