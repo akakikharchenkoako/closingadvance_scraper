@@ -148,13 +148,13 @@ for listing_page in os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/.
                       "purchasePrice, " \
                       "listingSource) " \
                       "VALUES " \
-                      "({0},'{1}','{2}',{3},'{4}')" \
-                    .format(listing_id,
-                            price_history_dict.get('listingDate', ''),
-                            price_history_dict.get('listingEvent', ''),
-                            price_history_dict.get('purchasePrice', 'NULL'),
-                            price_history_dict.get('listingSource', ''))
-                cursor.execute(sql)
+                      "(%s,%s,%s,%s,%s)"
+                cursor.execute(sql,
+                            (listing_id,
+                            price_history_dict.get('listingDate', None),
+                            price_history_dict.get('listingEvent', None),
+                            price_history_dict.get('purchasePrice', None),
+                            price_history_dict.get('listingSource', None)))
                 price_history_dict_list.append(price_history_dict)
             if price_history_dict_list:
                 pass
@@ -176,11 +176,11 @@ for listing_page in os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/.
                       "listingDate, " \
                       "taxPrice) " \
                       "VALUES " \
-                      "({0},'{1}',{2})" \
-                    .format(listing_id,
-                            tax_history_dict.get('listingDate', ''),
-                            tax_history_dict.get('taxPrice', 'NULL'))
-                cursor.execute(sql)
+                      "(%s,%s,%s)"
+                cursor.execute(sql,
+                                (listing_id,
+                                tax_history_dict.get('listingDate', None),
+                                tax_history_dict.get('taxPrice', None)))
                 tax_history_dict_list.append(tax_history_dict)
             if tax_history_dict_list:
                 pass
@@ -218,39 +218,41 @@ for listing_page in os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/.
                   "medianDaysOnMarket, " \
                   "neighborhoodPricePerSqFt) " \
                   "VALUES " \
-                  "({0},'{1}','{2}','{3}','{4}','{5}','{6}',{7},{8},{9},{10}," \
-                  "{11},{12},'{13}','{14}',{15},{16},{17},{18},{19},{20}," \
-                  "{21},{22},'{23}',{24},{25},{26},{27})"\
-                .format(listing_id,
-                        originUrl,
-                        agentUrl if agentUrl else '',
-                        agentName if agentName else '',
-                        '',
-                        status if status else '',
-                        soldDate if soldDate else '',
-                        beds if beds else 'NULL',
-                        baths if baths else 'NULL',
-                        sqft if sqft else 'NULL',
-                        lotSize if lotSize else 'NULL',
-                        photoCount if photoCount else 'NULL',
-                        lastSoldPrice if lastSoldPrice else 'NULL',
-                        propertyAddress if propertyAddress else '',
-                        zipCode if zipCode else '',
-                        averageNearbySchoolRating / len(nearby_schools_dict_list) if nearby_schools_dict_list else 'NULL',
-                        len(nearby_schools_dict_list),
-                        moreExpensiveThanNearbyProperties if moreExpensiveThanNearbyProperties else 'NULL',
-                        lessExpensiveThanNearbyProperties if lessExpensiveThanNearbyProperties else 'NULL',
-                        daysOnMarket if daysOnMarket else 'NULL',
-                        soldHigherThanTheListedPrice if soldHigherThanTheListedPrice else 'NULL',
-                        soldLowerThanTheListedPrice if soldLowerThanTheListedPrice else 'NULL',
-                        pricePerSqFt if pricePerSqFt else 'NULL',
-                        propertyType if propertyType else 'NULL',
-                        yearBuilt if yearBuilt else 'NULL',
-                        medianListingPrice if medianListingPrice else 'NULL',
-                        medianDaysOnMarket if medianDaysOnMarket else 'NULL',
-                        averagePricePerSqFt if averagePricePerSqFt else 'NULL')
+                  "(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s," \
+                  "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s," \
+                  "%s,%s,%s,%s,%s,%s,%s)"
 
-            cursor.execute(sql)
+            cursor.execute(sql,
+                           (listing_id,
+                            originUrl,
+                            agentUrl if agentUrl else None,
+                            agentName if agentName else None,
+                            None,
+                            status if status else None,
+                            soldDate if soldDate else None,
+                            beds if beds else None,
+                            baths if baths else None,
+                            sqft if sqft else None,
+                            lotSize if lotSize else None,
+                            photoCount if photoCount else None,
+                            lastSoldPrice if lastSoldPrice else None,
+                            propertyAddress if propertyAddress else None,
+                            zipCode if zipCode else None,
+                            averageNearbySchoolRating / len(
+                                nearby_schools_dict_list) if nearby_schools_dict_list else None,
+                            len(nearby_schools_dict_list),
+                            moreExpensiveThanNearbyProperties if moreExpensiveThanNearbyProperties else None,
+                            lessExpensiveThanNearbyProperties if lessExpensiveThanNearbyProperties else None,
+                            daysOnMarket if daysOnMarket else None,
+                            soldHigherThanTheListedPrice if soldHigherThanTheListedPrice else None,
+                            soldLowerThanTheListedPrice if soldLowerThanTheListedPrice else None,
+                            pricePerSqFt if pricePerSqFt else None,
+                            propertyType if propertyType else None,
+                            yearBuilt if yearBuilt else None,
+                            medianListingPrice if medianListingPrice else None,
+                            medianDaysOnMarket if medianDaysOnMarket else None,
+                            averagePricePerSqFt if averagePricePerSqFt else None)
+                           )
 
             # Commit your changes in the database
             db.commit()
