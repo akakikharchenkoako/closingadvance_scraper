@@ -42,7 +42,8 @@ class RealtorListingFromQualifiedUrlsSpider(scrapy.Spider):
                                  method="POST",
                                  headers=headers,
                                  body=json.dumps(payload),
-                                 callback=self.parse_listing)
+                                 callback=self.parse_listing,
+                                 meta={'listing_url': listing_url})
 
     def parse_listing(self, response):
         self.logger.info('Crawled (%d) %s' % (response.status, response.url))
@@ -58,4 +59,4 @@ class RealtorListingFromQualifiedUrlsSpider(scrapy.Spider):
             except Exception as e:
                 with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/failure_list.csv",
                           "a") as output_file:
-                    output_file.write(response.url + "\n")
+                    output_file.write(response.meta['listing_url'] + "\n")
