@@ -21,8 +21,6 @@ with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/outpu
     for line in f:
         listing_urls_list.append(line.strip())
 
-shuffle(listing_urls_list)
-
 for listing_url in listing_urls_list:
     print listing_url
 
