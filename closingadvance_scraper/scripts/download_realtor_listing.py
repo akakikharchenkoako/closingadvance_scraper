@@ -3,15 +3,13 @@
 print('If you get error "ImportError: No module named \'six\'" install six:\n'+\
     '$ sudo pip install six');
 
-import sys
+
 import os
 import re
-from fake_useragent import UserAgent
 from random import shuffle
 import requests
 import json
 
-ua = UserAgent()
 
 with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/failure_list.csv", "w") as output_file:
     output_file.write("")
