@@ -6,7 +6,6 @@ print('If you get error "ImportError: No module named \'six\'" install six:\n'+\
 
 import os
 import re
-from random import shuffle
 import requests
 import json
 
