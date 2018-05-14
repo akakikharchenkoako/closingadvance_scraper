@@ -21,7 +21,7 @@ for listing_page in os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/.
             page_tree = etree.parse(os.path.dirname(
                 os.path.realpath(__file__)) + "/../external_data/output/listing_pages/" + listing_page, parser)
 
-            listing_id = listing_page[:-5]
+            listing_id = str(listing_page[:-5])
             listingPropertyJson = json.loads(
                 re.findall(re.compile(r'MOVE_DATA.propertyDetails,(.*?)\);\n', flags=re.DOTALL),
                            etree.tostring(page_tree).decode("utf-8"))[0].strip())
