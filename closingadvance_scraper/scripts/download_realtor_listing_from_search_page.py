@@ -29,9 +29,19 @@ for zipcode in new_zipcodes_list:
     headers['User-Agent'] = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36"
     headers['Content-Type'] = "application/json"
 
-    payload = {"headers": {}, "method": "GET", "url": search_url.format(zipcode)}
-    response_json = json.loads(requests.post("http://127.0.0.1:22999/api/test/24000", data=payload).text)
-    html_content = response_json["response"]["body"]
+    retry_limit = 3
+
+    while retry_limit > 0:
+        try:
+            payload = {"headers": {}, "method": "GET", "url": search_url.format(zipcode)}
+            response_json = json.loads(requests.post("http://127.0.0.1:22999/api/test/24000", data=payload).text)
+            html_content = response_json["response"]["body"]
+            break
+        except Exception as e:
+            retry_limit -= 1
+
+    if retry_limit == 0:
+        break
 
     print search_url.format(zipcode)
 
