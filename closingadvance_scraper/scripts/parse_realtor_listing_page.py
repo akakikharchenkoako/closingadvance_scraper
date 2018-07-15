@@ -9,7 +9,7 @@ from lxml import etree
 base_url = "https://www.realtor.com"
 
 # Open database connection
-db = pymysql.connect("127.0.0.1", "root", "ceg2ececeg2ece", "closing_advance")
+db = pymysql.connect("127.0.0.1", "root", "password", "cag")
 
 # prepare a cursor object using cursor() method
 cursor = db.cursor()
@@ -27,10 +27,12 @@ for listing_page in os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/.
                            etree.tostring(page_tree).decode("utf-8"))[0].strip())
             listingProvider = listingPropertyJson.get("listing_provider", {})
             originUrl = page_tree.xpath("//link[@rel='canonical']/@href")[0]
-            propertyType = listingPropertyJson['prop_type']
             agentUrl = base_url + listingProvider.get("agent_profile_link") if listingProvider.get(
                 "agent_profile_link") else None
             agentName = listingProvider.get("agent_name")
+            brokerName = listingProvider.get("broker_name")
+            brokerMobile = listingProvider.get("broker_number")
+            brokerOfficePhone = listingProvider.get("office_contact")
             status = listingPropertyJson.get("property_status")
             soldDate = page_tree.xpath("//span[@data-label='property-meta-sold-date']/text()")
             if soldDate:
@@ -41,6 +43,8 @@ for listing_page in os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/.
                 soldDate = None
             beds = str(listingPropertyJson.get("beds", ""))
             baths = str(listingPropertyJson.get("baths" ""))
+            if not baths.isdigit():
+                baths = str(re.sub("[^\d\.]", "", baths))
             sqft = str(listingPropertyJson.get("sqft", ""))
             lotSize = str(listingPropertyJson.get("lot_size", ""))
             photoCount = page_tree.xpath('//a[@id="hero-view-photo"]/span[3]/text()')
@@ -159,7 +163,7 @@ for listing_page in os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/.
             if price_history_dict_list:
                 pass
 
-
+            mostRecentTaxPrice = None
 
             tax_history_block_list = page_tree.xpath('//div[@id="ldp-history-taxes"]//table/tbody/tr')
             tax_history_dict_list = []
@@ -183,17 +187,17 @@ for listing_page in os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/.
                                 tax_history_dict.get('taxPrice', None)))
                 tax_history_dict_list.append(tax_history_dict)
             if tax_history_dict_list:
-                pass
-
-
+                mostRecentTaxPrice = tax_history_dict_list[0]['taxPrice']
 
             # Prepare SQL query to INSERT a record into the database.
             sql = "INSERT INTO realtor_listings_julien(" \
                   "id, " \
                   "originUrl, " \
-                  "agentUrl, " \
                   "agentName, " \
                   "agentMobile, " \
+                  "brokerName, " \
+                  "brokerMobile, " \
+                  "brokerOffice, " \
                   "status, " \
                   "soldDate, " \
                   "beds, " \
@@ -202,6 +206,7 @@ for listing_page in os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/.
                   "lotSize, " \
                   "photoCount, " \
                   "lastSoldPrice, " \
+                  "mostRecentTaxPrice, " \
                   "propertyAddress, " \
                   "zipCode, " \
                   "averageNearbySchoolRating, " \
@@ -212,22 +217,23 @@ for listing_page in os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/.
                   "soldHigherThanTheListedPrice, " \
                   "soldLowerThanTheListedPrice, " \
                   "pricePerSqFt, " \
-                  "propertyType, " \
                   "yearBuilt, " \
                   "medianListingPrice, " \
                   "medianDaysOnMarket, " \
                   "neighborhoodPricePerSqFt) " \
                   "VALUES " \
                   "(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s," \
-                  "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s," \
+                  "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s," \
                   "%s,%s,%s,%s,%s,%s,%s)"
 
-            cursor.execute(sql,
+            print(cursor.execute(sql,
                            (listing_id,
                             originUrl,
-                            agentUrl if agentUrl else None,
                             agentName if agentName else None,
                             None,
+                            brokerName if brokerName else None,
+                            brokerMobile if brokerMobile else None,
+                            brokerOfficePhone if brokerOfficePhone else None,
                             status if status else None,
                             soldDate if soldDate else None,
                             beds if beds else None,
@@ -236,6 +242,7 @@ for listing_page in os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/.
                             lotSize if lotSize else None,
                             photoCount if photoCount else None,
                             lastSoldPrice if lastSoldPrice else None,
+                            mostRecentTaxPrice if mostRecentTaxPrice else None,
                             propertyAddress if propertyAddress else None,
                             zipCode if zipCode else None,
                             averageNearbySchoolRating / len(
@@ -247,12 +254,11 @@ for listing_page in os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/.
                             soldHigherThanTheListedPrice if soldHigherThanTheListedPrice else None,
                             soldLowerThanTheListedPrice if soldLowerThanTheListedPrice else None,
                             pricePerSqFt if pricePerSqFt else None,
-                            propertyType if propertyType else None,
                             yearBuilt if yearBuilt else None,
                             medianListingPrice if medianListingPrice else None,
                             medianDaysOnMarket if medianDaysOnMarket else None,
                             averagePricePerSqFt if averagePricePerSqFt else None)
-                           )
+                           ))
 
             # Commit your changes in the database
             db.commit()

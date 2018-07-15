@@ -16,7 +16,7 @@ with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/outpu
 output_file.close()
 listing_urls_list = []
 
-with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/qualified_realtor_sold_listings.csv") as f:
+with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/july_13/florida_listing_list.csv") as f:
     for line in f:
         listing_urls_list.append(line.strip())
 
