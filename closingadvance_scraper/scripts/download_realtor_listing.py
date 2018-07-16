@@ -10,6 +10,7 @@ import sys
 import requests
 import random
 import json
+from fake_useragent import UserAgent
 
 if len(sys.argv) > 1:
     zipcode = sys.argv[1]
@@ -38,6 +39,7 @@ else:
     success_output_file.close()
 
 new_listing_urls_list = []
+ua = UserAgent()
 
 with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/listing_searches_by_zip_codes/florida_{0}_listings_list.csv".format(zipcode)) as f:
     for line in f:
@@ -55,7 +57,10 @@ for listing_url in new_listing_urls_list:
 
         while retry_limit > 0:
             try:
-                payload = {"headers": {}, "method": "GET", "url": listing_url}
+                headers = {}
+                headers['User-Agent'] = ua.chrome
+                headers['Content-Type'] = "application/json"
+                payload = {"headers": headers, "method": "GET", "url": listing_url}
                 response_json = json.loads(requests.post("http://127.0.0.1:22999/api/test/24000", data=payload).text)
                 html_content = response_json["response"]["body"]
                 break
