@@ -22,10 +22,6 @@ for zipcode in zipcodes.filter_by(zipcodes.list_all(), active=True):
         new_zipcodes_list.append(zipcode['zip_code'])
 
 for zipcode in new_zipcodes_list:
-    headers = {}
-    headers['User-Agent'] = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36"
-    headers['Content-Type'] = "application/json"
-
     retry_limit = 3
 
     while retry_limit > 0:
