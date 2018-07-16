@@ -8,6 +8,7 @@ import os
 import re
 import sys
 import requests
+import random
 import json
 
 if len(sys.argv) > 1:
@@ -43,6 +44,7 @@ with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/outpu
         if line.strip() not in success_listing_urls_list:
             new_listing_urls_list.append(line.strip())
 
+random.shuffle(new_listing_urls_list)
 continuous_failure = 0
 
 for listing_url in new_listing_urls_list:
