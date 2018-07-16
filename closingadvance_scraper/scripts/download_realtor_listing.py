@@ -6,17 +6,23 @@ print('If you get error "ImportError: No module named \'six\'" install six:\n'+\
 
 import os
 import re
+import sys
 import requests
 import json
-
 
 with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/failure_list.csv", "w") as output_file:
     output_file.write("")
 
 output_file.close()
+
+if len(sys.argv) > 1:
+    zipcode = sys.argv[1]
+else:
+    zipcode = '33316'
+
 listing_urls_list = []
 
-with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/july_13/florida_listing_list.csv") as f:
+with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/listing_searches_by_zip_codes/florida_{0}_listings_list.csv".format(zipcode)) as f:
     for line in f:
         listing_urls_list.append(line.strip())
 
@@ -35,7 +41,7 @@ for listing_url in listing_urls_list:
             html_content = html_content.encode('utf-8')
             listing_id = re.findall(re.compile(r'"property_id":(.*?),', flags=re.DOTALL), html_content)[0].strip()
             if listing_id:
-                with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/listing_pages/{0}.html".format(listing_id), "w") as listing_file:
+                with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/listing_pages/{0}/{1}.html".format(zipcode, listing_id), "w") as listing_file:
                     listing_file.write(html_content)
     except Exception as e:
         with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/failure_list.csv",

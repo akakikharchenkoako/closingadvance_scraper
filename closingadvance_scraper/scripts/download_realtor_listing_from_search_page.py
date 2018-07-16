@@ -15,9 +15,6 @@ import json
 realtor_home_url = "https://www.realtor.com"
 search_url = "https://www.realtor.com/realestateandhomes-search/{0}/type-single-family-home/price-150000-550000/nc-hide"
 
-if len(sys.argv) > 1:
-    search_url = sys.argv[1]
-
 new_zipcodes_list = []
 for zipcode in zipcodes.filter_by(zipcodes.list_all(), active=True):
     if zipcode['state'] == "FL" and \
