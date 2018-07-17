@@ -89,7 +89,7 @@ for listing_url in new_listing_urls_list:
     except Exception as e:
         print(e)
         continuous_failure += 1
-        if continuous_failure > 3:
+        if continuous_failure > 10:
             print("Proxy doesn't work properly!!!")
             break
 
