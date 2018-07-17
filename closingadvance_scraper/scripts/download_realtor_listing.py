@@ -8,6 +8,7 @@ import os
 import re
 import sys
 import requests
+import time
 import random
 import json
 from fake_useragent import UserAgent
@@ -53,7 +54,7 @@ for listing_url in new_listing_urls_list:
     print listing_url
 
     try:
-        retry_limit = 3
+        retry_limit = 10
 
         while retry_limit > 0:
             try:
@@ -65,6 +66,7 @@ for listing_url in new_listing_urls_list:
                 html_content = response_json["response"]["body"]
                 break
             except Exception as e:
+                time.sleep(6)
                 retry_limit -= 1
 
         if retry_limit == 0:
