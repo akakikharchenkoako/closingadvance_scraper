@@ -13,7 +13,7 @@ import json
 from lxml import etree
 from fake_useragent import UserAgent
 
-luminati_port = '33999'
+luminati_port = '22999'
 realtor_home_url = "https://www.realtor.com"
 
 if not os.path.exists(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/agent_profile_pages"):
