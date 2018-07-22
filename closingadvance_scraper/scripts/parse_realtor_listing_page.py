@@ -127,6 +127,8 @@ for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) 
             if averagePricePerSqFt:
                 averagePricePerSqFt = re.sub("[^\d\.]", "", averagePricePerSqFt[0]).strip()
 
+            print(agentUrl)
+
             averageNearbySchoolRating = 0
 
             nearby_schools_block_list = page_tree.xpath('//div[@id="load-more-schools"]//table/tbody/tr')
@@ -152,7 +154,7 @@ for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) 
             if nearby_schools_dict_list:
                 pass
 
-
+            print("|-nearby")
 
             price_history_block_list = page_tree.xpath('//div[@id="ldp-history-price"]//table/tbody/tr')
             price_history_dict_list = []
@@ -192,6 +194,8 @@ for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) 
             if price_history_dict_list:
                 pass
 
+            print("|-price_history")
+
             mostRecentTaxPrice = None
 
             tax_history_block_list = page_tree.xpath('//div[@id="ldp-history-taxes"]//table/tbody/tr')
@@ -218,10 +222,13 @@ for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) 
             if tax_history_dict_list:
                 mostRecentTaxPrice = tax_history_dict_list[0]['taxPrice']
 
+            print("|-tax")
+
             # Prepare SQL query to INSERT a record into the database.
             sql = "INSERT INTO realtor_listings_julien(" \
                   "id, " \
                   "originUrl, " \
+                  "agentUrl, " \
                   "agentName, " \
                   "agentMobile1, " \
                   "agentMobile2, " \
@@ -255,12 +262,13 @@ for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) 
                   "neighborhoodPricePerSqFt) " \
                   "VALUES " \
                   "(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s," \
-                  "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s," \
+                  "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s," \
                   "%s,%s,%s,%s,%s,%s,%s)"
 
-            print(cursor.execute(sql,
+            cursor.execute(sql,
                            (listing_id,
                             originUrl,
+                            agentUrl,
                             agentName if agentName else None,
                             agentMobiles[0],
                             agentMobiles[1],
@@ -293,12 +301,12 @@ for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) 
                             medianListingPrice if medianListingPrice else None,
                             medianDaysOnMarket if medianDaysOnMarket else None,
                             averagePricePerSqFt if averagePricePerSqFt else None)
-                           ))
-
+                           )
+            print("|-listing")
             # Commit your changes in the database
             db.commit()
         except Exception as e:
-            print(e)
+            print("|->>>>" + str(e))
             # Rollback in case there is any error
             db.rollback()
 
