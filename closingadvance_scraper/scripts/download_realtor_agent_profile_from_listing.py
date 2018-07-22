@@ -79,15 +79,14 @@ for file_path in listing_pages_path_list:
             raise Exception()
 
         if html_content:
-            mls_id = re.findall(re.compile(r'MLSID: "(.*?)",', flags=re.DOTALL), html_content)[0].strip()
-            if mls_id:
-                with open(os.path.dirname(os.path.realpath(__file__)) +
-                          "/../external_data/output/agent_profile_pages/{0}.html".format(
-                              agent_profile_page_name), "w") as agent_profile_file:
-                    agent_profile_file.write(html_content)
-                    agent_profile_file.close()
-                continuous_failure = 0
-                print mls_id + "  -  " + agent_profile_link
+            with open(os.path.dirname(os.path.realpath(__file__)) +
+                      "/../external_data/output/agent_profile_pages/{0}.html".format(
+                          agent_profile_page_name), "w") as agent_profile_file:
+                agent_profile_file.write(html_content)
+                agent_profile_file.close()
+
+            continuous_failure = 0
+            print agent_profile_link
     except Exception as e:
         print(e)
         continuous_failure += 1
