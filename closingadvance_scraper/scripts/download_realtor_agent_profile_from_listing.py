@@ -12,6 +12,7 @@ import json
 from lxml import etree
 from fake_useragent import UserAgent
 
+luminati_port = '22999'
 realtor_home_url = "https://www.realtor.com"
 
 if not os.path.exists(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/agent_profile_pages"):
@@ -47,7 +48,7 @@ for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) 
                     headers['User-Agent'] = ua.chrome
                     headers['Content-Type'] = "application/json"
                     payload = {"headers": headers, "method": "GET", "url": agent_profile_link}
-                    response_json = json.loads(requests.post("http://127.0.0.1:33999/api/test/24000", data=payload).text)
+                    response_json = json.loads(requests.post("http://127.0.0.1:{0}/api/test/24000".format(luminati_port), data=payload).text)
                     html_content = response_json["response"]["body"]
                     html_content = html_content.encode('utf-8')
 
@@ -56,7 +57,7 @@ for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) 
                             0].strip()
 
                         payload["url"] = agent_profile_link
-                        response_json = json.loads(requests.post("http://127.0.0.1:33999/api/test/24000",
+                        response_json = json.loads(requests.post("http://127.0.0.1:{0}/api/test/24000".format(luminati_port),
                                                                  data=payload).text)
                         html_content = response_json["response"]["body"]
                         html_content = html_content.encode('utf-8')
