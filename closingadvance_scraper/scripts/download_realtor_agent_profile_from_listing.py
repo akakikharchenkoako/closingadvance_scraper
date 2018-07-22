@@ -31,6 +31,7 @@ for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) 
         listing_pages_path_list.append(file_path)
 
 random.shuffle(listing_pages_path_list)
+print "Total listings: " + str(len(listing_pages_path_list))
 
 for file_path in listing_pages_path_list:
     parser = etree.HTMLParser()
