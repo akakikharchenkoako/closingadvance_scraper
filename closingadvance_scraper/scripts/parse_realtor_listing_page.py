@@ -206,6 +206,8 @@ for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) 
                 taxPrice = tax_record.xpath('./td[2]/text()')
                 if taxPrice:
                     taxPrice = re.sub("[^\d\.]", "", taxPrice[0])
+                    if not taxPrice:
+                        continue
                 tax_history_dict = {'listingDate': listingDate, 'taxPrice': taxPrice if taxPrice else None}
                 if not taxPrice.isdigit():
                     del tax_history_dict['taxPrice']
