@@ -25,7 +25,7 @@ continuous_failure = 0
 
 listing_pages_path_list = []
 
-for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/listing_pages"):
+for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/listing_pages_by_zip_codes"):
     for filename in files:
         file_path = os.path.join(root, filename)
         listing_pages_path_list.append(file_path)
