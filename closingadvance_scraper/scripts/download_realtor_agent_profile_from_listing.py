@@ -78,6 +78,7 @@ for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) 
                         agent_profile_file.write(html_content)
                         agent_profile_file.close()
                     continuous_failure = 0
+                    print mls_id + "  -  " + agent_profile_link
         except Exception as e:
             print(e)
             continuous_failure += 1
