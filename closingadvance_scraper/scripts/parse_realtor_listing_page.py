@@ -14,21 +14,50 @@ db = pymysql.connect("127.0.0.1", "root", "password", "cag")
 # prepare a cursor object using cursor() method
 cursor = db.cursor()
 
-for listing_page in os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/listing_pages"):
-    if listing_page.endswith(".html"):
+for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/listing_pages_by_zip_codes"):
+    for filename in files:
+        file_path = os.path.join(root, filename)
+
         try:
             parser = etree.HTMLParser()
-            page_tree = etree.parse(os.path.dirname(
-                os.path.realpath(__file__)) + "/../external_data/output/listing_pages/" + listing_page, parser)
-
-            listing_id = str(listing_page[:-5])
+            page_tree = etree.parse(file_path, parser)
+            listing_id = str(filename[:-5])
             listingPropertyJson = json.loads(
                 re.findall(re.compile(r'MOVE_DATA.propertyDetails,(.*?)\);\n', flags=re.DOTALL),
                            etree.tostring(page_tree).decode("utf-8"))[0].strip())
             listingProvider = listingPropertyJson.get("listing_provider", {})
             originUrl = page_tree.xpath("//link[@rel='canonical']/@href")[0]
-            agentUrl = base_url + listingProvider.get("agent_profile_link") if listingProvider.get(
-                "agent_profile_link") else None
+            agent_profile_link = page_tree.xpath("//a[@data-omtag='ldp:listingProvider:agentProfile']/@href")
+
+            if not agent_profile_link:
+                continue
+
+            agentUrl = base_url + agent_profile_link[0]
+            agent_profile_page_name = agentUrl[agentUrl.rfind('/') + 1:]
+            agent_profile_page_path = os.path.dirname(os.path.realpath(__file__)) + \
+                                      "/../external_data/output/agent_profile_pages/{0}.html".format(agent_profile_page_name)
+
+            if not os.path.exists(agent_profile_page_path):
+                continue
+
+            agent_parser = etree.HTMLParser()
+            agent_page_tree = etree.parse(agent_profile_page_path, agent_parser)
+            agentMobiles = [None, None, None, None]
+            agentOffice = None
+            mobileIndex = 0
+
+            for node in agent_page_tree.xpath('//div[@id="modalcontactInfo"]//li/i[contains(@class, "fa-phone")]'):
+                if 'Office:' in node.tail:
+                    agentOffice = node.xpath('./parent::*/a/span/text()')[0]
+                    continue
+
+                if 'Mobile:' in node.tail and node.xpath('./parent::*/a/span/text()'):
+                    agentMobiles[mobileIndex] = node.xpath('./parent::*/a/span/text()')[0]
+                    mobileIndex += 1
+
+                    if mobileIndex >= 4:
+                        break
+
             agentName = listingProvider.get("agent_name")
             brokerName = listingProvider.get("broker_name")
             brokerMobile = listingProvider.get("broker_number")
@@ -194,7 +223,10 @@ for listing_page in os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/.
                   "id, " \
                   "originUrl, " \
                   "agentName, " \
-                  "agentMobile, " \
+                  "agentMobile1, " \
+                  "agentMobile2, " \
+                  "agentMobile3, " \
+                  "agentMobile4, " \
                   "brokerName, " \
                   "brokerMobile, " \
                   "brokerOffice, " \
@@ -222,7 +254,7 @@ for listing_page in os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/.
                   "medianDaysOnMarket, " \
                   "neighborhoodPricePerSqFt) " \
                   "VALUES " \
-                  "(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s," \
+                  "(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s," \
                   "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s," \
                   "%s,%s,%s,%s,%s,%s,%s)"
 
@@ -230,7 +262,10 @@ for listing_page in os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/.
                            (listing_id,
                             originUrl,
                             agentName if agentName else None,
-                            None,
+                            agentMobiles[0],
+                            agentMobiles[1],
+                            agentMobiles[2],
+                            agentMobiles[3],
                             brokerName if brokerName else None,
                             brokerMobile if brokerMobile else None,
                             brokerOfficePhone if brokerOfficePhone else None,
