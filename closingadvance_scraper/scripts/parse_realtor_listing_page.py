@@ -127,7 +127,7 @@ for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) 
             if averagePricePerSqFt:
                 averagePricePerSqFt = re.sub("[^\d\.]", "", averagePricePerSqFt[0]).strip()
 
-            print(agentUrl)
+            print(originUrl)
 
             averageNearbySchoolRating = 0
 
@@ -201,11 +201,12 @@ for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) 
             tax_history_block_list = page_tree.xpath('//div[@id="ldp-history-taxes"]//table/tbody/tr')
             tax_history_dict_list = []
             for tax_record in tax_history_block_list:
+                print(tax_record)
                 listingDate = tax_record.xpath('./td[1]/text()')[0] if tax_record.xpath('./td[1]/text()') else 'NULL'
                 taxPrice = tax_record.xpath('./td[2]/text()')
                 if taxPrice:
                     taxPrice = re.sub("[^\d\.]", "", taxPrice[0])
-                tax_history_dict = {'listingDate': listingDate, 'taxPrice': taxPrice}
+                tax_history_dict = {'listingDate': listingDate, 'taxPrice': taxPrice if taxPrice else None}
                 if not taxPrice.isdigit():
                     del tax_history_dict['taxPrice']
                 sql = "INSERT INTO realtor_tax_histories_julien(" \
