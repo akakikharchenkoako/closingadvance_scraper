@@ -9,9 +9,13 @@ import re
 import sys
 import requests
 import time
+import pymysql
 import random
 import json
 from fake_useragent import UserAgent
+
+db = pymysql.connect("127.0.0.1", "root", "password", "cag")
+cursor = db.cursor()
 
 if len(sys.argv) > 1:
     zipcode = sys.argv[1]
@@ -52,6 +56,19 @@ continuous_failure = 0
 
 for listing_url in new_listing_urls_list:
     print listing_url
+
+    sql = "SELECT * FROM realtor_crawled_listings " \
+          "WHERE originUrl=%s"
+    cursor.fetchall(sql, (listing_url))
+
+    if cursor.rowcount > 0:
+        with open(os.path.dirname(os.path.realpath(
+                __file__)) + "/../external_data/output/listing_pages_by_zip_codes/{}/success_list.csv".format(
+            zipcode),
+                  "a") as success_output_file:
+            success_output_file.write(listing_url + "\n")
+        success_output_file.close()
+        continue
 
     try:
         retry_limit = 10
