@@ -14,7 +14,7 @@ db = pymysql.connect("127.0.0.1", "root", "ceg2ececeg2ece", "closing_advance")
 # prepare a cursor object using cursor() method
 cursor = db.cursor()
 
-for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/listing_pages_by_zip_codes"):
+for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) + "/../../external_data/output/listing_pages_by_zip_codes"):
     for filename in files:
         file_path = os.path.join(root, filename)
         print(file_path)
