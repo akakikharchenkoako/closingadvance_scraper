@@ -228,7 +228,7 @@ for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) 
             print("|-tax")
 
             # Prepare SQL query to INSERT a record into the database.
-            sql = "INSERT INTO realtor_listings_julien(" \
+            sql = "INSERT INTO realtor_listings_eric(" \
                   "id, " \
                   "originUrl, " \
                   "agentUrl, " \
