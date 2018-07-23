@@ -9,7 +9,7 @@ from lxml import etree
 base_url = "https://www.realtor.com"
 
 # Open database connection
-db = pymysql.connect("127.0.0.1", "root", "password", "cag")
+db = pymysql.connect("127.0.0.1", "root", "ceg2ececeg2ece", "closing_advance")
 
 # prepare a cursor object using cursor() method
 cursor = db.cursor()
