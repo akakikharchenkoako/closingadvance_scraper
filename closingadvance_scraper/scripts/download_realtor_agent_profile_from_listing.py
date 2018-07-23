@@ -36,8 +36,12 @@ print "Total listings: " + str(len(listing_pages_path_list))
 for file_path in listing_pages_path_list:
     parser = etree.HTMLParser()
     page_tree = etree.parse(file_path, parser)
-    agent_profile_link = page_tree.xpath("//a[@data-omtag='ldp:listingProvider:agentProfile']/@href")
-    print file_path
+    try:
+        agent_profile_link = page_tree.xpath("//a[@data-omtag='ldp:listingProvider:agentProfile']/@href")
+        print file_path
+    except Exception as e:
+        print e
+        continue
 
     if not agent_profile_link:
         print "|-agent profile doesn't exist"
