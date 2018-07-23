@@ -28,7 +28,7 @@ for root, subdirs, files in os.walk(os.path.dirname(os.path.realpath(__file__)) 
             print("|-originUrl: " + originUrl)
             sql = "INSERT INTO realtor_crawled_listings(" \
                   "listing_id, " \
-                  "originUrl, " \
+                  "originUrl) " \
                   "VALUES " \
                   "(%s,%s)"
             cursor.execute(sql,
