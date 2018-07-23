@@ -37,8 +37,10 @@ for file_path in listing_pages_path_list:
     parser = etree.HTMLParser()
     page_tree = etree.parse(file_path, parser)
     agent_profile_link = page_tree.xpath("//a[@data-omtag='ldp:listingProvider:agentProfile']/@href")
+    print file_path
 
     if not agent_profile_link:
+        print "|-agent profile doesn't exist"
         continue
 
     agent_profile_link = realtor_home_url + agent_profile_link[0]
@@ -46,6 +48,7 @@ for file_path in listing_pages_path_list:
 
     if os.path.exists(os.path.dirname(os.path.realpath(__file__)) +
                       "/../external_data/output/agent_profile_pages/{0}.html".format(agent_profile_page_name)):
+        print "|-agent profile was already crawled before"
         continue
 
     try:
@@ -71,6 +74,7 @@ for file_path in listing_pages_path_list:
                     html_content = response_json["response"]["body"]
                     html_content = html_content.encode('utf-8')
 
+                print "|-agent profile was crawled successfully"
                 break
             except Exception as e:
                 time.sleep(6)
