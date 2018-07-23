@@ -59,9 +59,9 @@ for listing_url in new_listing_urls_list:
 
     sql = "SELECT * FROM realtor_crawled_listings " \
           "WHERE originUrl=%s"
-    cursor.fetchall(sql, (listing_url))
+    row_count = cursor.execute(sql, (listing_url))
 
-    if cursor.rowcount > 0:
+    if row_count > 0:
         with open(os.path.dirname(os.path.realpath(
                 __file__)) + "/../external_data/output/listing_pages_by_zip_codes/{}/success_list.csv".format(
             zipcode),
@@ -102,6 +102,19 @@ for listing_url in new_listing_urls_list:
                           "a") as success_output_file:
                     success_output_file.write(listing_url + "\n")
                 success_output_file.close()
+                try:
+                    sql = "INSERT INTO realtor_crawled_listings(" \
+                          "listing_id, " \
+                          "originUrl) " \
+                          "VALUES " \
+                          "(%s,%s)"
+                    cursor.execute(sql,
+                                   (listing_id,
+                                    listing_url))
+                    db.commit()
+                except:
+                    pass
+
                 continuous_failure = 0
     except Exception as e:
         print(e)
@@ -110,3 +123,4 @@ for listing_url in new_listing_urls_list:
             print("Proxy doesn't work properly!!!")
             break
 
+db.close()
