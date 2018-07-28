@@ -68,6 +68,7 @@ for listing_url in new_listing_urls_list:
                   "a") as success_output_file:
             success_output_file.write(listing_url + "\n")
         success_output_file.close()
+        print "|-crawled before by other zipcodes"
         continue
 
     try:
@@ -113,6 +114,7 @@ for listing_url in new_listing_urls_list:
                                     listing_url))
                     db.commit()
                 except:
+                    print "|-crawled a few mins ago by zip codes scraper"
                     pass
 
                 continuous_failure = 0
