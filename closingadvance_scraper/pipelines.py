@@ -871,25 +871,31 @@ class MySQLPipeline(object):
         try:
             BrownBook.get(BrownBook.title == item['title'])
         except BrownBook.DoesNotExist:
-            BrownBook.create(
-                title=item.get('title'),
-                link=item.get('link'),
-                address=item.get('address'),
-                telephone=item.get('telephone'),
-                mobile=item.get('mobile'),
-                email=item.get('email'),
-                website=item.get('website'),
-                business_tags=item.get('business_tags')
-            )
+            try:
+                BrownBook.create(
+                    title=item.get('title'),
+                    link=item.get('link'),
+                    address=item.get('address'),
+                    telephone=item.get('telephone'),
+                    mobile=item.get('mobile'),
+                    email=item.get('email'),
+                    website=item.get('website'),
+                    business_tags=item.get('business_tags')
+                )
+            except Exception as e:
+                print(e)
         else:
-            q = BrownBook.update(
-                link=item.get('link'),
-                address=item.get('address'),
-                telephone=item.get('telephone'),
-                mobile=item.get('mobile'),
-                email=item.get('email'),
-                website=item.get('website'),
-                business_tags=item.get('business_tags')
-            ).where(BrownBook.title == item['title'])
-            q.execute()
+            try:
+                q = BrownBook.update(
+                    link=item.get('link'),
+                    address=item.get('address'),
+                    telephone=item.get('telephone'),
+                    mobile=item.get('mobile'),
+                    email=item.get('email'),
+                    website=item.get('website'),
+                    business_tags=item.get('business_tags')
+                ).where(BrownBook.title == item['title'])
+                q.execute()
+            except Exception as e:
+                print(e)
         return item

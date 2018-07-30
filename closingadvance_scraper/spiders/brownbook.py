@@ -2,7 +2,6 @@
 
 import scrapy
 from closingadvance_scraper.items import BrownBookItem
-from closingadvance_scraper.loaders import BrownBookLoader
 
 
 class BrownBookSpider(scrapy.Spider):
@@ -18,16 +17,15 @@ class BrownBookSpider(scrapy.Spider):
             yield response.follow(category_link, self.parse_category_page, cookies={'setcountry': 'us'})
 
     def parse_category_page(self, response):
-        business_infos_list = []
-
         for business_block in response.xpath('//div[@id="business_inner"]//div[@class="h-card vcard"]'):
-            l = BrownBookLoader(item=BrownBookItem(), response=response)
-
             is_summary_view = business_block.xpath('.//img[@alt="This is my business"]')
 
             if is_summary_view:
-                yield response.follow(business_block.xpath('.//h2[contains(@class, "business_sub_head_title")]/a/@href').extract_first(), self.parse_business_page, cookies={'setcountry': 'us'})
+                yield response.follow(business_block.xpath('.//h2[contains(@class, "business_sub_head_title")]/a/@href')
+                                      .extract_first(), self.parse_business_page, cookies={'setcountry': 'us'})
             else:
+                item = BrownBookItem()
+
                 business_info = {}
 
                 business_info['title'] = business_block.xpath('.//h2[contains(@class, "business_sub_head_title")]//span/text()').extract_first()
@@ -46,9 +44,9 @@ class BrownBookSpider(scrapy.Spider):
                 print(business_info)
 
                 for key in business_info:
-                    l.add_value(key, business_info[key])
+                    item[key] = business_info[key]
 
-                yield l.load_item()
+                yield item
 
         next_page_link = response.xpath('//div[@class="pages"]/a[@class="standardlink" and contains(text(), "next page")]/@href').extract_first()
 
@@ -56,7 +54,7 @@ class BrownBookSpider(scrapy.Spider):
             yield response.follow(next_page_link, self.parse_category_page, cookies={'setcountry': 'us'})
 
     def parse_business_page(self, response):
-        l = BrownBookLoader(item=BrownBookItem(), response=response)
+        item = BrownBookItem()
 
         business_info = {}
 
@@ -82,6 +80,6 @@ class BrownBookSpider(scrapy.Spider):
         print(business_info)
 
         for key in business_info:
-            l.add_value(key, business_info[key])
+            item[key] = business_info[key]
 
-        yield l.load_item()
+        yield item

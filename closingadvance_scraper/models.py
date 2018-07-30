@@ -424,5 +424,5 @@ class BrownBook(Model):
     business_tags = CharField(null=True)
 
     class Meta:
-        db_table = 'lenders'
+        db_table = 'brownbook'
         database = db

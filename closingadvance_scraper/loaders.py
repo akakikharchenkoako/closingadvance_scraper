@@ -122,7 +122,3 @@ class AttorneyLoader(ItemLoader):
     default_output_processor = TakeFirst()
 
     phone_in = MapCompose(serialize_number)
-
-
-class BrownBookLoader(ItemLoader):
-    pass
