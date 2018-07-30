@@ -411,3 +411,18 @@ class RealtorNearbyHistoryForJulien(Model):
     class Meta:
         db_table = 'realtor_nearby_histories_julien'
         database = db
+
+
+class BrownBook(Model):
+    title = CharField(null=False, unique=True)
+    link = CharField(null=True)
+    address = CharField(null=True)
+    telephone = CharField(null=True)
+    mobile = CharField(null=True)
+    email = CharField(null=True)
+    website = CharField(null=True)
+    business_tags = CharField(null=True)
+
+    class Meta:
+        db_table = 'brownbook'
+        database = db

@@ -227,3 +227,14 @@ class LenderItem(scrapy.Item):
     officePhone = scrapy.Field()
     website = scrapy.Field()
     email = scrapy.Field()
+
+
+class BrownBookItem(scrapy.Item):
+    title = scrapy.Field()
+    link = scrapy.Field()
+    address = scrapy.Field()
+    telephone = scrapy.Field()
+    mobile = scrapy.Field()
+    email = scrapy.Field()
+    website = scrapy.Field()
+    business_tags = scrapy.Field()
