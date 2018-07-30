@@ -67,6 +67,8 @@ class MySQLPipeline(object):
             return self.process_realtor_listing_for_julien_item(item, spider)
         elif isinstance(item, RealtorListingFix1ForJulienItem):
             return self.process_realtor_listing_fix1_for_julien_item(item, spider)
+        elif isinstance(item, BrownBookItem):
+            return self.process_brownbook_item(item, spider)
         else:
             return item
 
@@ -863,4 +865,31 @@ class MySQLPipeline(object):
         ).where(RealtorListingJulien.originUrl == item['originUrl'])
         q.execute()
 
+        return item
+
+    def process_brownbook_item(self, item, spider):
+        try:
+            BrownBook.get(BrownBook.title == item['title'])
+        except BrownBook.DoesNotExist:
+            BrownBook.create(
+                title=item.get('title'),
+                link=item.get('link'),
+                address=item.get('address'),
+                telephone=item.get('telephone'),
+                mobile=item.get('mobile'),
+                email=item.get('email'),
+                website=item.get('website'),
+                business_tags=item.get('business_tags')
+            )
+        else:
+            q = BrownBook.update(
+                link=item.get('link'),
+                address=item.get('address'),
+                telephone=item.get('telephone'),
+                mobile=item.get('mobile'),
+                email=item.get('email'),
+                website=item.get('website'),
+                business_tags=item.get('business_tags')
+            ).where(BrownBook.title == item['title'])
+            q.execute()
         return item

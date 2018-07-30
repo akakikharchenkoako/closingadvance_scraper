@@ -123,3 +123,6 @@ class AttorneyLoader(ItemLoader):
 
     phone_in = MapCompose(serialize_number)
 
+
+class BrownBookLoader(ItemLoader):
+    pass
