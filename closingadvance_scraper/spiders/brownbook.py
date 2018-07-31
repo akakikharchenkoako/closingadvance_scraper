@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import scrapy
+import random
 from closingadvance_scraper.items import BrownBookItem
 from scrapy.spidermiddlewares.httperror import HttpError
 from twisted.internet.error import DNSLookupError
@@ -16,7 +17,7 @@ class BrownBookSpider(scrapy.Spider):
         yield scrapy.Request(self.start_url, callback=self.parse_categories_list_page)
 
     def parse_categories_list_page(self, response):
-        for category_link in response.xpath('//div[@id="promo_full"]//table//td/a/@href').extract():
+        for category_link in random(response.xpath('//div[@id="promo_full"]//table//td/a/@href').extract()):
             yield response.follow(category_link,
                                   callback=self.parse_category_page,
                                   cookies={'setcountry': 'us'})
