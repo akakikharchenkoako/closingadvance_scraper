@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import scrapy
+from random import shuffle
 from closingadvance_scraper.items import BrownBookItem
 from scrapy.spidermiddlewares.httperror import HttpError
 from twisted.internet.error import DNSLookupError
@@ -16,10 +17,12 @@ class BrownBookSpider(scrapy.Spider):
         yield scrapy.Request(self.start_url, callback=self.parse_categories_list_page)
 
     def parse_categories_list_page(self, response):
-        for category_link in response.xpath('//div[@id="promo_full"]//table//td/a/@href').extract():
+        categories_link_list = response.xpath('//div[@id="promo_full"]//table//td/a/@href').extract()
+        shuffle(categories_link_list)
+
+        for category_link in categories_link_list:
             yield response.follow(category_link,
                                   callback=self.parse_category_page,
-                                  errback=self.errback_httpbin,
                                   cookies={'setcountry': 'us'})
 
     def parse_category_page(self, response):
