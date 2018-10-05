@@ -12,6 +12,11 @@ from lxml import html
 import zipcodes
 import json
 
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 realtor_home_url = "https://www.realtor.com"
 search_url = "https://www.realtor.com/realestateandhomes-search/{0}/type-single-family-home/price-150000-550000/nc-hide"
 
