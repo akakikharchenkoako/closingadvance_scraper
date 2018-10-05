@@ -35,7 +35,7 @@ for zipcode in new_zipcodes_list:
                 opener = request.build_opener(
                     request.ProxyHandler(
                         {
-                            'http': 'http://lum-customer-creditadvisory-zone-dedicated-country-us:sjuk34itz0oe@zproxy.lum-superproxy.io:22225'}))
+                            'http': 'http://127.0.0.1:24000'}))
                 html_content = opener.open(search_url.format(zipcode)).read()
             if sys.version_info[0] == 3:
                 import urllib.request
@@ -43,7 +43,7 @@ for zipcode in new_zipcodes_list:
                 opener = urllib.request.build_opener(
                     urllib.request.ProxyHandler(
                         {
-                            'http': 'http://lum-customer-creditadvisory-zone-dedicated-country-us:sjuk34itz0oe@zproxy.lum-superproxy.io:22225'}))
+                            'http': 'http://127.0.0.1:24000'}))
                 html_content = opener.open(search_url.format(zipcode)).read()
 
             break
@@ -97,7 +97,7 @@ for zipcode in new_zipcodes_list:
                         opener = request.build_opener(
                             request.ProxyHandler(
                                 {
-                                    'http': 'http://lum-customer-creditadvisory-zone-dedicated-country-us:sjuk34itz0oe@zproxy.lum-superproxy.io:22225'}))
+                                    'http': 'http://127.0.0.1:24000'}))
                         html_content = opener.open(next_page_url).read()
                     if sys.version_info[0] == 3:
                         import urllib.request
@@ -105,7 +105,7 @@ for zipcode in new_zipcodes_list:
                         opener = urllib.request.build_opener(
                             urllib.request.ProxyHandler(
                                 {
-                                    'http': 'http://lum-customer-creditadvisory-zone-dedicated-country-us:sjuk34itz0oe@zproxy.lum-superproxy.io:22225'}))
+                                    'http': 'http://127.0.0.1:24000'}))
                         html_content = opener.open(next_page_url).read()
 
                     break
