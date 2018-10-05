@@ -26,9 +26,26 @@ for zipcode in new_zipcodes_list:
 
     while retry_limit > 0:
         try:
-            payload = {"headers": {}, "method": "GET", "url": search_url.format(zipcode)}
-            response_json = json.loads(requests.post("http://127.0.0.1:22999/api/test/24000", data=payload).text)
-            html_content = response_json["response"]["body"]
+            import sys
+
+            if sys.version_info[0] == 2:
+                import six
+                from six.moves.urllib import request
+
+                opener = request.build_opener(
+                    request.ProxyHandler(
+                        {
+                            'http': 'http://lum-customer-creditadvisory-zone-dedicated-country-us:sjuk34itz0oe@zproxy.lum-superproxy.io:22225'}))
+                html_content = opener.open(search_url.format(zipcode)).read()
+            if sys.version_info[0] == 3:
+                import urllib.request
+
+                opener = urllib.request.build_opener(
+                    urllib.request.ProxyHandler(
+                        {
+                            'http': 'http://lum-customer-creditadvisory-zone-dedicated-country-us:sjuk34itz0oe@zproxy.lum-superproxy.io:22225'}))
+                html_content = opener.open(search_url.format(zipcode)).read()
+
             break
         except Exception as e:
             retry_limit -= 1
@@ -70,8 +87,27 @@ for zipcode in new_zipcodes_list:
             while retry_limit > 0:
                 try:
                     payload = {"headers": {}, "method": "GET", "url": next_page_url}
-                    response_json = json.loads(requests.post("http://127.0.0.1:22999/api/test/24000", data=payload).text)
-                    html_content = response_json["response"]["body"]
+
+                    import sys
+
+                    if sys.version_info[0] == 2:
+                        import six
+                        from six.moves.urllib import request
+
+                        opener = request.build_opener(
+                            request.ProxyHandler(
+                                {
+                                    'http': 'http://lum-customer-creditadvisory-zone-dedicated-country-us:sjuk34itz0oe@zproxy.lum-superproxy.io:22225'}))
+                        html_content = opener.open(next_page_url).read()
+                    if sys.version_info[0] == 3:
+                        import urllib.request
+
+                        opener = urllib.request.build_opener(
+                            urllib.request.ProxyHandler(
+                                {
+                                    'http': 'http://lum-customer-creditadvisory-zone-dedicated-country-us:sjuk34itz0oe@zproxy.lum-superproxy.io:22225'}))
+                        html_content = opener.open(next_page_url).read()
+
                     break
                 except Exception as e:
                     retry_limit -= 1
