@@ -12,6 +12,11 @@ from lxml import html
 import zipcodes
 import json
 
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 realtor_home_url = "https://www.realtor.com"
 search_url = "https://www.realtor.com/realestateandhomes-search/{0}/type-single-family-home/price-150000-550000/nc-hide"
 
@@ -26,11 +31,22 @@ for zipcode in new_zipcodes_list:
 
     while retry_limit > 0:
         try:
-            payload = {"headers": {}, "method": "GET", "url": search_url.format(zipcode)}
-            response_json = json.loads(requests.post("http://127.0.0.1:22999/api/test/24000", data=payload).text)
-            html_content = response_json["response"]["body"]
+            from six.moves.urllib import request
+
+            opener = request.build_opener(
+                request.ProxyHandler(
+                    {'https': 'http://127.0.0.1:24000'}))
+#            html_content = opener.open(
+#                'https://www.realtor.com/realestateandhomes-search/32615/type-single-family-home/price-150000-550000/nc-hide').read()
+
+            html_content = opener.open(search_url.format(zipcode)).read()
+
+            if "Blocked IP Address" in html_content.decode('utf-8'):
+                raise Exception(".....IP is blocked")
+
             break
         except Exception as e:
+            print e
             retry_limit -= 1
 
     if retry_limit == 0:
@@ -43,7 +59,7 @@ for zipcode in new_zipcodes_list:
 
         while html_content:
             urls_list = []
-            html_content = html_content.encode('utf-8')
+            html_content = html_content.decode('utf-8')
             page_tree = html.fromstring(html_content)
             urls_list = [realtor_home_url + str(url) for url in page_tree.xpath("//ul[@id='radius-properties']/li/@data-url")]
 
@@ -56,7 +72,7 @@ for zipcode in new_zipcodes_list:
             for url in urls_list:
                 output_file.write(url + '\n')
 
-            next_page_url = page_tree.xpath("//div[@id='ResultsPerPageBottom']//a[@data-omtag='srp:paging:next']/@href")
+            next_page_url = page_tree.xpath("//div[@id='ResultsPerPageBottom']//a[@data-omtag='for_sale:srp_list:paging:next']/@href")
 
             if not next_page_url:
                 break
@@ -70,10 +86,21 @@ for zipcode in new_zipcodes_list:
             while retry_limit > 0:
                 try:
                     payload = {"headers": {}, "method": "GET", "url": next_page_url}
-                    response_json = json.loads(requests.post("http://127.0.0.1:22999/api/test/24000", data=payload).text)
-                    html_content = response_json["response"]["body"]
+
+                    from six.moves.urllib import request
+
+                    opener = request.build_opener(
+                        request.ProxyHandler(
+                            {'https': 'http://127.0.0.1:24000'}))
+
+                    html_content = opener.open(next_page_url).read()
+
+                    if "Blocked IP Address" in html_content.decode('utf-8'):
+                        raise Exception("IP is blocked")
+
                     break
                 except Exception as e:
+                    print e
                     retry_limit -= 1
 
             if retry_limit == 0:
