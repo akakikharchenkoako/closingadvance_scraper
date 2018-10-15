@@ -14,6 +14,11 @@ import random
 import json
 from fake_useragent import UserAgent
 
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 db = pymysql.connect("127.0.0.1", "root", "ceg2ececeg2ece", "closing_advance")
 cursor = db.cursor()
 
