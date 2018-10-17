@@ -9,11 +9,15 @@ import re
 import requests
 import time
 import random
+import sys
 import json
 from lxml import etree
 from fake_useragent import UserAgent
 
-luminati_port = '22999'
+
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 realtor_home_url = "https://www.realtor.com"
 
 if not os.path.exists(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/agent_profile_pages"):
@@ -60,23 +64,31 @@ for file_path in listing_pages_path_list:
 
         while retry_limit > 0:
             try:
-                headers = {}
-                headers['User-Agent'] = ua.chrome
-                headers['Content-Type'] = "application/json"
-                payload = {"headers": headers, "method": "GET", "url": agent_profile_link}
-                response_json = json.loads(requests.post("http://127.0.0.1:{0}/api/test/24000".format(luminati_port), data=payload).text)
-                html_content = response_json["response"]["body"]
-                html_content = html_content.encode('utf-8')
+                from six.moves.urllib import request
+
+                opener = request.build_opener(
+                    request.ProxyHandler(
+                        {'https': 'http://127.0.0.1:24000'}))
+                #            html_content = opener.open(
+                #                'https://www.realtor.com/realestateandhomes-search/32615/type-single-family-home/price-150000-550000/nc-hide').read()
+
+                html_content = opener.open(agent_profile_link).read()
+                html_content = html_content.decode('utf-8')
 
                 if html_content.startswith("<html><body>You are being "):
                     agent_profile_link = re.findall(re.compile(r'<a href="(.*?)">', flags=re.DOTALL), html_content)[
                         0].strip()
 
-                    payload["url"] = agent_profile_link
-                    response_json = json.loads(requests.post("http://127.0.0.1:{0}/api/test/24000".format(luminati_port),
-                                                             data=payload).text)
-                    html_content = response_json["response"]["body"]
-                    html_content = html_content.encode('utf-8')
+                    from six.moves.urllib import request
+
+                    opener = request.build_opener(
+                        request.ProxyHandler(
+                            {'https': 'http://127.0.0.1:24000'}))
+                    #            html_content = opener.open(
+                    #                'https://www.realtor.com/realestateandhomes-search/32615/type-single-family-home/price-150000-550000/nc-hide').read()
+
+                    html_content = opener.open(agent_profile_link).read()
+                    html_content = html_content.decode('utf-8')
 
                 print "|-agent profile was crawled successfully"
                 break
