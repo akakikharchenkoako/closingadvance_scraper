@@ -14,6 +14,11 @@ import random
 import json
 from fake_useragent import UserAgent
 
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 db = pymysql.connect("127.0.0.1", "root", "password", "cag")
 cursor = db.cursor()
 
@@ -76,12 +81,15 @@ for listing_url in new_listing_urls_list:
 
         while retry_limit > 0:
             try:
-                headers = {}
-                headers['User-Agent'] = ua.chrome
-                headers['Content-Type'] = "application/json"
-                payload = {"headers": headers, "method": "GET", "url": listing_url}
-                response_json = json.loads(requests.post("http://127.0.0.1:22999/api/test/24000", data=payload).text)
-                html_content = response_json["response"]["body"]
+                from six.moves.urllib import request
+
+                opener = request.build_opener(
+                    request.ProxyHandler(
+                        {'https': 'http://127.0.0.1:24000'}))
+                #            html_content = opener.open(
+                #                'https://www.realtor.com/realestateandhomes-search/32615/type-single-family-home/price-150000-550000/nc-hide').read()
+
+                html_content = opener.open(listing_url).read()
                 break
             except Exception as e:
                 time.sleep(6)
@@ -91,7 +99,7 @@ for listing_url in new_listing_urls_list:
             raise Exception()
 
         if html_content:
-            html_content = html_content.encode('utf-8')
+            html_content = html_content.decode('utf-8')
             listing_id = re.findall(re.compile(r'"property_id":(.*?),', flags=re.DOTALL), html_content)[0].strip()
             if listing_id:
                 with open(os.path.dirname(os.path.realpath(__file__)) + "/../external_data/output/listing_pages_by_zip_codes/{0}/{1}.html".format(zipcode, listing_id), "w") as listing_file:
